@@ -26,7 +26,7 @@ std::string GetFileName()
     return std::string(fileName.c_str());
 }
 
-template<>double GetNumber<double>()
+template<>double GetNumber<double>(std::string texte1 = std::string(), std::string texte2 = std::string(), std::string texte3 = std::string())
 {
     double x;
 
