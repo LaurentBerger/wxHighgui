@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 
 
-set(NomProjet wxNano)
+set(NomProjet wxNanoPrj)
 PROJECT (${NomProjet})
 find_package(wxWidgets COMPONENTS core base net adv aui html  qa richtext stc ribbon xml gl REQUIRED)
 

@@ -1,89 +1,38 @@
-#include "wx/wx.h"
-#include <wx/numdlg.h>
+#include "wxNano.h"
+#include<memory>
 #include<iostream>
 #include<string>
 
-class GetNumberApp : public wxApp
+int argc = 0;
+char **argv = NULL;
+std::shared_ptr<wxInitializer> init=InitWX(argc,argv);
+
+
+std::shared_ptr<wxInitializer> InitWX(int argc,char **argv)
 {
-public:
-    int number;
-    virtual bool OnInit()
-    {
-        number = wxGetNumberFromUser("enter number", "your prompt here", "your caption here", 1);
-
-        return false;
-    }
-};
-
-class GetTextApp : public wxApp
-{
-public:
-    wxString texte;
-    virtual bool OnInit()
-    {
-        texte = wxGetTextFromUser("enter number", "your prompt here", "");
-
-        return false;
+    std::shared_ptr<wxInitializer> init= std::make_shared<wxInitializer>(argc, argv);
+    if (!init->IsOk()) {
+        wxPrintf("Failed to initialize wxWidgets.\n");
+        return init;
     }
 
-};
-
-class GetFileNameApp : public wxApp
-{
-public:
-    std::string fileName;
-    virtual bool OnInit()
-    {
-        fileName = wxFileSelector("Choose a file to open");
-
-        return false;
-    }
-};
+    wxApp::SetInstance(new wxApp());
+    return init;
+}
 
 std::string GetFileName()
 {
-    std::string x;
-    GetFileNameApp* pApp = new GetFileNameApp();
-    wxApp::SetInstance(pApp);
-    wxEntryStart(0, NULL);
-    wxTheApp->OnInit();
-
-    x = pApp->fileName;
-    // cleaning up...
-    wxTheApp->OnExit();
-    wxEntryCleanup();
-
-    return x;
-}
-
-template<class T>T GetNumber()
-{
-    T x;
-    GetNumberApp* pApp = new GetNumberApp();
-    wxApp::SetInstance(pApp);
-    wxEntryStart(0, NULL);
-    wxTheApp->OnInit();
-
-    x = pApp->number;
-    // cleaning up...
-    wxTheApp->OnExit();
-    wxEntryCleanup();
-
-    return x;
+    wxString fileName = wxFileSelector("Choose a file to open");
+    return std::string(fileName.c_str());
 }
 
 template<>double GetNumber<double>()
 {
     double x;
-    GetTextApp* pApp = new GetTextApp();
-    wxApp::SetInstance(pApp);
-    wxEntryStart(0, NULL);
-    wxTheApp->OnInit();
 
-    pApp->texte.ToCDouble(&x);
-    // cleaning up...
-    wxTheApp->OnExit();
-    wxEntryCleanup();
+    wxString texte = wxGetTextFromUser("enter number", "your prompt here", "");
+    texte.ToCDouble(&x);
 
     return x;
 }
+

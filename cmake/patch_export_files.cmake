@@ -1,6 +1,6 @@
 message( "patch export")
-file(GLOB_RECURSE _configFiles "${CMAKE_INSTALL_PREFIX}/lib/cmake/AALib/AALibConfig-*.cmake")
-message( ${CMAKE_INSTALL_PREFIX}/lib/cmake/AALib)
+file(GLOB_RECURSE _configFiles "${CMAKE_INSTALL_PREFIX}/lib/cmake/wxNano/wxNanoConfig-*.cmake")
+message( ${CMAKE_INSTALL_PREFIX}/lib/cmake/wxNano)
 foreach(_configFile ${_configFiles})
     message ( ${_configFiles})
     file (READ "${_configFile}" _contents)
