@@ -4,8 +4,8 @@
 #include <wx/numdlg.h>
 #include<string>
 #include<memory>
-
 #include<opencv2/opencv.hpp>
+
 
 std::shared_ptr<wxInitializer> InitWX(int , char **);
 

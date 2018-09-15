@@ -18,7 +18,7 @@ std::shared_ptr<wxInitializer> InitWX(int argc,char **argv)
     //https://docs.wxwidgets.org/trunk/classwx_initializer.html#a7b53997659917e3703a6fe2950fe56a2
     std::shared_ptr<wxInitializer> init= std::make_shared<wxInitializer>(argc, argv);
     wxInitializeStockLists();
-    if (!init->IsOk()) {
+    if (!init.get()->IsOk()) {
         wxPrintf("Failed to initialize wxWidgets.\n");
         return init;
     }
