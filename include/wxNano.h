@@ -5,8 +5,11 @@
 #include<string>
 #include<memory>
 
+#include<opencv2/opencv.hpp>
+
 std::shared_ptr<wxInitializer> InitWX(int , char **);
 
+namespace wxNano {
 
 
 template<typename T>T GetNumber(std::string texte1 = std::string(), std::string texte2 = std::string(), std::string texte3 = std::string())
@@ -26,6 +29,12 @@ template<typename T>T GetNumber(std::string texte1 = std::string(), std::string 
 template<>double GetNumber<double>(std::string texte1, std::string texte2, std::string texte3);
 
 std::string GetFileName();
+int waitKey(int tps);
+void imshow(const std::string &  	winname, cv::InputArray  	mat);
+};
+
+
+
 
 #endif
 

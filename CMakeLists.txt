@@ -1,13 +1,15 @@
 cmake_minimum_required(VERSION 3.0)
 
 
-set(NomProjet wxNanoPrj)
+set(NomProjet wxNano)
 PROJECT (${NomProjet})
 find_package(wxWidgets COMPONENTS core base net adv aui html  qa richtext stc ribbon xml gl REQUIRED)
+find_package(opencv)
 
-set(wxNano_VERSION_MAJOR 0 CACHE STRING "major version" FORCE)
-set(wxNano_VERSION_MINOR 0 CACHE STRING "minor version" FORCE)
-set(wxNano_VERSION ${wxNano_VERSION_MAJOR}.${wxNano_VERSION_MINOR} CACHE STRING "version" FORCE)
+set(wxNanoSample OFF CACHE BOOL "BaseName chosen by the user at CMake configure time")
+set(wxNanoLib_VERSION_MAJOR 0 CACHE STRING "major version" FORCE)
+set(wxNanoLib_VERSION_MINOR 0 CACHE STRING "minor version" FORCE)
+set(wxNanoLib_VERSION ${wxNanoLib_VERSION_MAJOR}.${wxNanoLib_VERSION_MINOR} CACHE STRING "version" FORCE)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_INCLUDE_CURRENT_DIR_IN_INTERFACE ON)
@@ -15,20 +17,20 @@ set(CMAKE_INCLUDE_CURRENT_DIR_IN_INTERFACE ON)
 include(GenerateExportHeader)
 
 
-file(GLOB wxNano_SRCS     "src/*.cpp")
-file(GLOB wxNano_Headers  "include/*.h" "include/*.hpp")
+file(GLOB wxNanoLib_SRCS     "src/*.cpp")
+file(GLOB wxNanoLib_Headers  "include/*.h" "include/*.hpp")
 
-message ("wxNano_VERSION ${wxNano_VERSION}")
+message ("wxNanoLib_VERSION ${wxNanoLib_VERSION}")
 message ("CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}")
 message ("CMAKE_CURRENT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}")
 message ("CMAKE_CONFIGURATION_TYPES ${CMAKE_CONFIGURATION_TYPES}")
 
 
-add_library (wxNano STATIC ${wxNano_SRCS})
+add_library (wxNanoLib STATIC ${wxNanoLib_SRCS})
 
-if (wxWidgets_FOUND)
-	include_directories(${wxWidgets_INCLUDE_DIRS})
-endif (wxWidgets_FOUND)
+if (wxWidgets_FOUND AND OPENCV_FOUND)
+	include_directories(${wxWidgets_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
+endif (wxWidgets_FOUND AND OPENCV_FOUND)
 
 if (DEFINED CMAKE_CONFIGURATION_TYPES)
   # multi-config handling
@@ -52,16 +54,16 @@ add_custom_command (OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_BUILD_CONFIG
                     COMMENT "Generating output_file")
 
 
-target_include_directories(wxNano PUBLIC
+target_include_directories(wxNanoLib PUBLIC
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 	$<INSTALL_INTERFACE:include>
 	PRIVATE source)
 
-generate_export_header( wxNano )
+generate_export_header( wxNanoLib )
 
-set_property(TARGET wxNano PROPERTY VERSION ${wxNano_VERSION})
+set_property(TARGET wxNanoLib PROPERTY VERSION ${wxNanoLib_VERSION})
 
-install(TARGETS wxNano EXPORT wxNanoConfig
+install(TARGETS wxNanoLib EXPORT wxNanoLibConfig
   LIBRARY DESTINATION "lib/\${CMAKE_INSTALL_CONFIG_NAME}"
   ARCHIVE DESTINATION "lib/\${CMAKE_INSTALL_CONFIG_NAME}"
   RUNTIME DESTINATION bin
@@ -69,24 +71,24 @@ install(TARGETS wxNano EXPORT wxNanoConfig
 )
 
 
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/wxNano_export.h"  DESTINATION include   COMPONENT    Devel)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/wxNanoLib_export.h"  DESTINATION include   COMPONENT    Devel)
 install(FILES ${wxNano_Headers} DESTINATION include)
 
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
-  "${CMAKE_CURRENT_BINARY_DIR}/wxNano/wxNanoConfigVersion.cmake"
-  VERSION ${wxNano_VERSION}
+  "${CMAKE_CURRENT_BINARY_DIR}/wxNanoLib/wxNanoLibConfigVersion.cmake"
+  VERSION ${wxNanoLib_VERSION}
   COMPATIBILITY AnyNewerVersion
 )
 
 
-set(ConfigPackageLocation lib/cmake/wxNano)
+set(ConfigPackageLocation lib/cmake/wxNanoLib)
 
 message ("ConfigPackageLocation ${ConfigPackageLocation}")
 
-install(EXPORT wxNanoConfig
+install(EXPORT wxNanoLibConfig
   FILE
-    wxNanoConfig.cmake
+    wxNanoLibConfig.cmake
   DESTINATION
     ${ConfigPackageLocation}
 )
@@ -94,3 +96,7 @@ install(EXPORT wxNanoConfig
 
 install(SCRIPT cmake/patch_export_files.cmake DESTINATION
     ${ConfigPackageLocation})
+    
+if (wxNanoSample)
+ADD_SUBDIRECTORY(sample)
+endif(wxNanoSample)
