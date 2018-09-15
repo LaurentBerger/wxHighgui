@@ -14,7 +14,7 @@ ADD_EXECUTABLE (${NomProjet} ${Projet_SRCS} )
 
 if (wxWidgets_FOUND AND opencv_FOUND AND wxNanoLib_FOUND)
 	include_directories(${wxWidgets_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
-	target_link_libraries (${NomProjet} LINK_PUBLIC  ${OpenCV_LIBS} ${wxWidgets_LIBRARIES} wxNano)
+	target_link_libraries (${NomProjet} LINK_PUBLIC  ${OpenCV_LIBS} ${wxWidgets_LIBRARIES} wxNanoLib)
 endif (wxWidgets_FOUND)
 SET(wxWidgets_DEFINITIONS WXUSINGDLL)
 set_target_properties(${NomProjet} PROPERTIES  COMPILE_DEFINITIONS "${wxWidgets_DEFINITIONS};__WXMSW__;_CRT_SECURE_NO_WARNINGS")

@@ -6,7 +6,7 @@ PROJECT (${NomProjet})
 find_package(wxWidgets COMPONENTS core base net adv aui html  qa richtext stc ribbon xml gl REQUIRED)
 find_package(opencv)
 
-set(wxNanoSample OFF CACHE BOOL "BaseName chosen by the user at CMake configure time")
+set(wxNanoSample OFF CACHE BOOL "wxNanoLib must be already installed")
 set(wxNanoLib_VERSION_MAJOR 0 CACHE STRING "major version" FORCE)
 set(wxNanoLib_VERSION_MINOR 0 CACHE STRING "minor version" FORCE)
 set(wxNanoLib_VERSION ${wxNanoLib_VERSION_MAJOR}.${wxNanoLib_VERSION_MINOR} CACHE STRING "version" FORCE)
@@ -72,7 +72,7 @@ install(TARGETS wxNanoLib EXPORT wxNanoLibConfig
 
 
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/wxNanoLib_export.h"  DESTINATION include   COMPONENT    Devel)
-install(FILES ${wxNano_Headers} DESTINATION include)
+install(FILES ${wxNanoLib_Headers} DESTINATION include)
 
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
