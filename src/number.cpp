@@ -244,6 +244,27 @@ namespace wxNano {
         }
         return c;
     }
+
+    void destroyAllWindows()
+    {
+        for (auto q : *winList.get())
+        {
+            std::shared_ptr<ocvFrame> o = q.second;
+            q.second->Close(true);
+        }
+
+    }
+    void destroyWindow(const std::string &  	winname)
+    {
+        for (auto q : *winList.get())
+        {
+            std::shared_ptr<ocvFrame> o = q.second;
+            if (q.first==winname)
+                q.second->Close(true);
+        }
+
+    }
+
 }
 
 

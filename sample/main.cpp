@@ -4,6 +4,8 @@
 
 #include <wx/evtloop.h>
 
+#define myGui wxNano
+
 class MyEventLoop : public wxEventLoopBase 
 { 
 };
@@ -22,17 +24,22 @@ void main(int argc,char**argv)
     std::cout << "Second number " << l2 << "\n";
  
     cv::Mat img = cv::imread("g:/lib/opencv/samples/data/baboon.jpg");
-    wxNano::imshow("test", img);
+    cv::Mat img2 = cv::imread("g:/lib/opencv/samples/data/lena.jpg");
+    myGui::imshow("myWxImage", img);
+    myGui::imshow("myWxImage2", img2);
     int code = 0;
     do
     {
-        code = wxNano::waitKey(1000);
-        std::cout << code << "\n";
+        code = myGui::waitKey(1000);
+        if (code)
+            std::cout << code << "\n";
     } 
     while (code != 27);
     std::string s = wxNano::GetFileName();
     std::cout << "File name " << s << "\n";
-//    dlg->Destroy();
+
+    myGui::destroyWindow("myWxImage");
+    myGui::destroyAllWindows();
 
     // cleaning up...
 }

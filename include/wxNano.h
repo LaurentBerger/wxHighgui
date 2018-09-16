@@ -31,6 +31,8 @@ template<>double GetNumber<double>(std::string texte1, std::string texte2, std::
 std::string GetFileName();
 int waitKey(int tps);
 void imshow(const std::string &  	winname, cv::InputArray  	mat);
+void destroyAllWindows();
+void destroyWindow(const std::string &  	winname);
 };
 
 
