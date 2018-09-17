@@ -23,7 +23,8 @@ void main(int argc,char**argv)
     double l2 = wxNano::GetNumber<double>("texte1","texte2");
     std::cout << "Second number " << l2 << "\n";
  
-    cv::Mat img = cv::imread("g:/lib/opencv/samples/data/baboon.jpg");
+    std::string s = wxNano::GetFileName();
+    cv::Mat img = cv::imread(s.c_str());
     cv::Mat img2 = cv::imread("g:/lib/opencv/samples/data/lena.jpg");
     myGui::imshow("myWxImage", img);
     myGui::imshow("myWxImage2", img2);
@@ -35,7 +36,6 @@ void main(int argc,char**argv)
             std::cout << code << "\n";
     } 
     while (code != 27);
-    std::string s = wxNano::GetFileName();
     std::cout << "File name " << s << "\n";
 
     myGui::destroyWindow("myWxImage");
