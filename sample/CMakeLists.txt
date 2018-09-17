@@ -6,9 +6,32 @@ find_package(opencv  REQUIRED)
 find_package(wxWidgets COMPONENTS core base net adv aui html  qa richtext stc ribbon xml gl REQUIRED)
 find_package(wxNanoLib REQUIRED)
 
+option(BUILD_SHARED_LIBS "use shared library" ON)
+
 file(GLOB Projet_SRCS
     "*.h"
     "*.cpp")
+if (NOT BUILD_SHARED_LIBS)
+find_package(glog)
+find_package(gflags)
+endif(BUILD_SHARED_LIBS)
+if (WIN32)
+	if (BUILD_SHARED_LIBS)
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd")
+	else (BUILD_SHARED_LIBS)
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
+	endif (BUILD_SHARED_LIBS)
+else (WIN32)
+	if (BUILD_SHARED_LIBS)
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
+	else (BUILD_SHARED_LIBS)
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
+	endif (BUILD_SHARED_LIBS)
+endif (WIN32)
 
 ADD_EXECUTABLE (${NomProjet} ${Projet_SRCS} )
 
