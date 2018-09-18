@@ -11,6 +11,7 @@ std::shared_ptr<wxInitializer> InitWX(int , char **);
 
 namespace wxNano {
 
+typedef void(*MouseCallback) (int event, int x, int y, int flags, void *userdata);
 
 template<typename T>T GetNumber(std::string texte1 = std::string(), std::string texte2 = std::string(), std::string texte3 = std::string())
 {
@@ -33,6 +34,8 @@ int waitKey(int tps);
 void imshow(const std::string &  	winname, cv::InputArray  	mat);
 void destroyAllWindows();
 void destroyWindow(const std::string &  	winname);
+void setMouseCallback(const std::string &winname, MouseCallback onMouse, void *userdata);
+
 };
 
 

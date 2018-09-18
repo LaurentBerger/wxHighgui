@@ -6,11 +6,12 @@
 
 #define myGui wxNano
 
-class MyEventLoop : public wxEventLoopBase 
-{ 
-};
+void onMouse(int evt, int x, int y, int flags, void *f)
+{
+    std::cout << evt << " " << x << " " << y << " " << flags;
+}
 
-void main(int argc,char**argv)
+int main(int argc,char**argv)
 {
     
     int l1 = wxNano::GetNumber<int>();
@@ -25,9 +26,11 @@ void main(int argc,char**argv)
  
     std::string s = wxNano::GetFileName();
     cv::Mat img = cv::imread(s.c_str());
-    cv::Mat img2 = cv::imread("g:/lib/opencv/samples/data/lena.jpg");
-    myGui::imshow("myWxImage", img);
-    myGui::imshow("myWxImage2", img2);
+    myGui::imshow(s.c_str(), img);
+    s = wxNano::GetFileName();
+    cv::Mat img2 = cv::imread(s.c_str());
+    myGui::imshow(s.c_str(), img2);
+    myGui::setMouseCallback(s.c_str(),onMouse,NULL);
     int code = 0;
     do
     {
@@ -41,5 +44,5 @@ void main(int argc,char**argv)
     myGui::destroyWindow("myWxImage");
     myGui::destroyAllWindows();
 
-    // cleaning up...
+    return 0;
 }

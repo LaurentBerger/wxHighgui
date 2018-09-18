@@ -45,21 +45,31 @@ class ocvFrame : public wxFrame
 public:
     ocvFrame(wxFrame *parent, const wxString& desc, const wxImage& image, double scale = 1.0)
     {
+        mouseCB = NULL;
+        userdata = NULL;
         Create(parent, desc, wxBitmap(image, wxBITMAP_SCREEN_DEPTH, scale),
             image.GetImageCount(desc));
-        Bind(wxEVT_PAINT,&ocvFrame::OnPaint,this);
+        Bind(wxEVT_PAINT, &ocvFrame::OnPaint, this);
+        Bind(wxEVT_MOTION, &ocvFrame::OnMouse, this);
         Bind(wxEVT_ERASE_BACKGROUND, &ocvFrame::OnEraseBackground, this);
         Bind(wxEVT_KEY_DOWN, &ocvFrame::OnKey, this);
     }
 
     ocvFrame(wxFrame *parent, const wxString& desc, const wxBitmap& bitmap)
     {
+        mouseCB = NULL;
+        userdata = NULL;
         Create(parent, desc, bitmap);
         Bind(wxEVT_PAINT, &ocvFrame::OnPaint, this);
         Bind(wxEVT_ERASE_BACKGROUND, &ocvFrame::OnEraseBackground, this);
         Bind(wxEVT_KEY_DOWN, &ocvFrame::OnKey, this);
     }
     int GetKey() { int c = key; key = 0; return c; };
+    void setMouseCallback(wxNano::MouseCallback om, void *ud = 0)
+    {
+        userdata = ud;
+        mouseCB = om;
+    }
 
 private:
     bool Create(wxFrame *parent,
@@ -117,6 +127,15 @@ private:
     void OnKey(wxKeyEvent& event)
     {
         key = event.GetKeyCode();
+    }
+
+    void OnMouse(wxMouseEvent& event)
+    {
+        xMouse = event.GetPosition().x;
+        yMouse = event.GetPosition().y;
+        if (mouseCB != NULL)
+            (*mouseCB)(event.GetEventType(),xMouse, yMouse, event.GetEventCategory(), userdata);
+//        eventMouse = event.GetKeyCode();
     }
 
     void OnPaint(wxPaintEvent& WXUNUSED(event))
@@ -192,11 +211,15 @@ private:
             m_zoom);
         Refresh();
     }
-
     private:
     wxBitmap m_bitmap;
     double m_zoom;
     int key;
+    int xMouse, yMouse;
+    int eventMouse;
+    int flagsMouse;
+    wxNano::MouseCallback mouseCB;
+    void *userdata;
 
 };
 
@@ -256,7 +279,7 @@ namespace wxNano {
             std::shared_ptr<ocvFrame> o = q.second;
             q.second->Close(true);
         }
-
+        winList.get()->clear();
     }
     void destroyWindow(const std::string &  	winname)
     {
@@ -271,7 +294,15 @@ namespace wxNano {
         }
 
     }
+    void setMouseCallback(const std::string &winname, MouseCallback onMouse, void *userdata = 0)
+    {
+        auto q = winList.get()->find(winname);
+        if (q != winList.get()->end())
+        {
+            q->second.get()->setMouseCallback(onMouse, userdata);
+        }
+
+    }
 
 }
-
 
