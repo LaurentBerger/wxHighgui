@@ -10,12 +10,14 @@ char **argv = NULL;
 class ocvFrame;
 
 std::shared_ptr<wxInitializer> init = InitWX(argc, argv);
+std::shared_ptr<std::map<int, int>> InitWX2CVflags();
+std::shared_ptr<std::map<int, int>> InitWX2CVtypes();
 std::shared_ptr<std::map<std::string, std::shared_ptr<ocvFrame>> > winList;
 wxGUIEventLoop *eventLoop;
 
 
-std::shared_ptr<std::map<int, int>> evtWX2CVflags;
-std::shared_ptr<std::map<int, int>> evtWX2CVtypes;
+std::shared_ptr<std::map<int, int>> evtWX2CVflags = InitWX2CVflags();
+std::shared_ptr<std::map<int, int>> evtWX2CVtypes = InitWX2CVtypes();
 
 std::shared_ptr<wxInitializer> InitWX(int argc,char **argv)
 {
@@ -29,16 +31,25 @@ std::shared_ptr<wxInitializer> InitWX(int argc,char **argv)
     // https://docs.wxwidgets.org/trunk/classwx_app_console.html#a7ca751aa37cd3f920e20d9d967ad413d
     wxApp::SetInstance(new wxApp());
     eventLoop = new wxGUIEventLoop;
+    return init;
+}
 
-    evtWX2CVflags = std::make_shared<std::map<int,int>>(); 
+std::shared_ptr<std::map<int, int>> InitWX2CVflags()
+{
+    std::shared_ptr<std::map<int, int>> evtWX2CVflags = std::make_shared<std::map<int, int>>();
     evtWX2CVflags.get()->insert(std::make_pair(wxEVT_LEFT_DOWN, cv::EVENT_FLAG_LBUTTON));
     evtWX2CVflags.get()->insert(std::make_pair(wxEVT_RIGHT_DOWN, cv::EVENT_FLAG_RBUTTON));
     evtWX2CVflags.get()->insert(std::make_pair(wxEVT_MIDDLE_DOWN, cv::EVENT_FLAG_MBUTTON));
     evtWX2CVflags.get()->insert(std::make_pair(wxMOD_CONTROL, cv::EVENT_FLAG_CTRLKEY));
     evtWX2CVflags.get()->insert(std::make_pair(wxMOD_SHIFT, cv::EVENT_FLAG_SHIFTKEY));
     evtWX2CVflags.get()->insert(std::make_pair(wxMOD_ALT, cv::EVENT_FLAG_ALTKEY));
-    
-    evtWX2CVtypes = std::make_shared<std::map<int, int>>();
+
+    return evtWX2CVflags;
+}
+
+std::shared_ptr<std::map<int, int>> InitWX2CVtypes()
+{
+    std::shared_ptr<std::map<int, int>> evtWX2CVtypes = std::make_shared<std::map<int, int>>();
 
     evtWX2CVtypes.get()->insert(std::make_pair(wxEVT_MOTION, cv::EVENT_MOUSEMOVE));
     evtWX2CVtypes.get()->insert(std::make_pair(wxEVT_LEFT_DOWN, cv::EVENT_LBUTTONDOWN));
@@ -52,8 +63,9 @@ std::shared_ptr<wxInitializer> InitWX(int argc,char **argv)
     evtWX2CVtypes.get()->insert(std::make_pair(wxEVT_MIDDLE_DCLICK, cv::EVENT_MBUTTONDBLCLK));
     evtWX2CVtypes.get()->insert(std::make_pair(wxEVT_MOUSEWHEEL, cv::EVENT_MOUSEWHEEL));
 
-    return init;
+    return evtWX2CVtypes;
 }
+
 
 enum
 {
