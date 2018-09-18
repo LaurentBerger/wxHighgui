@@ -13,6 +13,10 @@ std::shared_ptr<wxInitializer> init = InitWX(argc, argv);
 std::shared_ptr<std::map<std::string, std::shared_ptr<ocvFrame>> > winList;
 wxGUIEventLoop *eventLoop;
 
+
+std::shared_ptr<std::map<int, int>> evtWX2CVflags;
+std::shared_ptr<std::map<int, int>> evtWX2CVtypes;
+
 std::shared_ptr<wxInitializer> InitWX(int argc,char **argv)
 {
     //https://docs.wxwidgets.org/trunk/classwx_initializer.html#a7b53997659917e3703a6fe2950fe56a2
@@ -25,6 +29,29 @@ std::shared_ptr<wxInitializer> InitWX(int argc,char **argv)
     // https://docs.wxwidgets.org/trunk/classwx_app_console.html#a7ca751aa37cd3f920e20d9d967ad413d
     wxApp::SetInstance(new wxApp());
     eventLoop = new wxGUIEventLoop;
+
+    evtWX2CVflags = std::make_shared<std::map<int,int>>(); 
+    evtWX2CVflags.get()->insert(std::make_pair(wxEVT_LEFT_DOWN, cv::EVENT_FLAG_LBUTTON));
+    evtWX2CVflags.get()->insert(std::make_pair(wxEVT_RIGHT_DOWN, cv::EVENT_FLAG_RBUTTON));
+    evtWX2CVflags.get()->insert(std::make_pair(wxEVT_MIDDLE_DOWN, cv::EVENT_FLAG_MBUTTON));
+    evtWX2CVflags.get()->insert(std::make_pair(wxMOD_CONTROL, cv::EVENT_FLAG_CTRLKEY));
+    evtWX2CVflags.get()->insert(std::make_pair(wxMOD_SHIFT, cv::EVENT_FLAG_SHIFTKEY));
+    evtWX2CVflags.get()->insert(std::make_pair(wxMOD_ALT, cv::EVENT_FLAG_ALTKEY));
+    
+    evtWX2CVtypes = std::make_shared<std::map<int, int>>();
+
+    evtWX2CVtypes.get()->insert(std::make_pair(wxEVT_MOTION, cv::EVENT_MOUSEMOVE));
+    evtWX2CVtypes.get()->insert(std::make_pair(wxEVT_LEFT_DOWN, cv::EVENT_LBUTTONDOWN));
+    evtWX2CVtypes.get()->insert(std::make_pair(wxEVT_RIGHT_DOWN, cv::EVENT_RBUTTONDOWN));
+    evtWX2CVtypes.get()->insert(std::make_pair(wxEVT_MIDDLE_DOWN, cv::EVENT_MBUTTONDOWN));
+    evtWX2CVtypes.get()->insert(std::make_pair(wxEVT_RIGHT_UP, cv::EVENT_LBUTTONUP));
+    evtWX2CVtypes.get()->insert(std::make_pair(wxEVT_RIGHT_UP, cv::EVENT_RBUTTONUP));
+    evtWX2CVtypes.get()->insert(std::make_pair(wxEVT_MIDDLE_UP, cv::EVENT_MBUTTONUP));
+    evtWX2CVtypes.get()->insert(std::make_pair(wxEVT_LEFT_DCLICK, cv::EVENT_LBUTTONDBLCLK));
+    evtWX2CVtypes.get()->insert(std::make_pair(wxEVT_RIGHT_DCLICK, cv::EVENT_RBUTTONDBLCLK));
+    evtWX2CVtypes.get()->insert(std::make_pair(wxEVT_MIDDLE_DCLICK, cv::EVENT_MBUTTONDBLCLK));
+    evtWX2CVtypes.get()->insert(std::make_pair(wxEVT_MOUSEWHEEL, cv::EVENT_MOUSEWHEEL));
+
     return init;
 }
 
@@ -134,7 +161,16 @@ private:
         xMouse = event.GetPosition().x;
         yMouse = event.GetPosition().y;
         if (mouseCB != NULL)
-            (*mouseCB)(event.GetEventType(),xMouse, yMouse, event.GetEventCategory(), userdata);
+        {
+            int type = 0, flag = 0;
+            auto t = evtWX2CVtypes.get()->find(event.GetEventType());
+            auto f = evtWX2CVflags.get()->find(event.m_altDown);
+            if (t != evtWX2CVtypes.get()->end())
+                type = t->second;
+            if (f != evtWX2CVflags.get()->end())
+                flag = f->second;
+            (*mouseCB)(type,xMouse, yMouse, flag, userdata);
+        }
 //        eventMouse = event.GetKeyCode();
     }
 

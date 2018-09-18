@@ -8,7 +8,8 @@
 
 void onMouse(int evt, int x, int y, int flags, void *f)
 {
-    std::cout << evt << " " << x << " " << y << " " << flags;
+    if (cv::EVENT_LBUTTONDOWN)
+        std::cout << evt << " " << x << " " << y << " " << flags;
 }
 
 int main(int argc,char**argv)
