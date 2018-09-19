@@ -55,7 +55,7 @@ std::shared_ptr<std::map<int, int>> InitWX2CVtypes()
     evtWX2CVtypes.get()->insert(std::make_pair(wxEVT_LEFT_DOWN, cv::EVENT_LBUTTONDOWN));
     evtWX2CVtypes.get()->insert(std::make_pair(wxEVT_RIGHT_DOWN, cv::EVENT_RBUTTONDOWN));
     evtWX2CVtypes.get()->insert(std::make_pair(wxEVT_MIDDLE_DOWN, cv::EVENT_MBUTTONDOWN));
-    evtWX2CVtypes.get()->insert(std::make_pair(wxEVT_RIGHT_UP, cv::EVENT_LBUTTONUP));
+    evtWX2CVtypes.get()->insert(std::make_pair(wxEVT_LEFT_UP, cv::EVENT_LBUTTONUP));
     evtWX2CVtypes.get()->insert(std::make_pair(wxEVT_RIGHT_UP, cv::EVENT_RBUTTONUP));
     evtWX2CVtypes.get()->insert(std::make_pair(wxEVT_MIDDLE_UP, cv::EVENT_MBUTTONUP));
     evtWX2CVtypes.get()->insert(std::make_pair(wxEVT_LEFT_DCLICK, cv::EVENT_LBUTTONDBLCLK));
@@ -75,8 +75,161 @@ enum
     ID_PAINT_BG
 };
 
+class ocvImage : public  wxWindow
+{
+public:
+    ocvImage(wxPanel *parent, const wxString& desc, const wxImage& image,const wxPoint pos,  const wxSize& s, double scale = 1.0):
+        wxWindow(parent,-1,pos,s)
+    {
+        posImage = pos;
+        InitOcvImage();
+        BindEvent();
+        m_bitmap = wxBitmap(image, wxBITMAP_SCREEN_DEPTH, scale);
+    }
 
+    int GetKey() 
+    { 
+        int c = key; 
+        key = 0; 
+        return c; 
+    };
+    void setMouseCallback(wxNano::MouseCallback om, void *ud = 0)
+    {
+        userdata = ud;
+        mouseCB = om;
+    }
 
+    void MoveImage(wxPoint d)
+    {
+        posImage += d;
+    }
+private:
+    void InitOcvImage()
+    {
+        mouseCB = NULL;
+        userdata = NULL;
+        id = 100;
+        m_zoom = 1;
+    }
+    void BindEvent(void)
+    {
+        Bind(wxEVT_PAINT, &ocvImage::OnPaint, this);
+        Bind(wxEVT_LEFT_DOWN, &ocvImage::OnMouse, this);
+        Bind(wxEVT_RIGHT_DOWN, &ocvImage::OnMouse, this);
+        Bind(wxEVT_RIGHT_DOWN, &ocvImage::OnMouse, this);
+        Bind(wxEVT_LEFT_UP, &ocvImage::OnMouse, this);
+        Bind(wxEVT_RIGHT_UP, &ocvImage::OnMouse, this);
+        Bind(wxEVT_RIGHT_UP, &ocvImage::OnMouse, this);
+        Bind(wxEVT_ERASE_BACKGROUND, &ocvImage::OnEraseBackground, this);
+        Bind(wxEVT_KEY_DOWN, &ocvImage::OnKey, this);
+    }
+
+    void OnEraseBackground(wxEraseEvent& WXUNUSED(event))
+    {
+        // do nothing here to be able to see how transparent images are shown
+    }
+
+    void OnKey(wxKeyEvent& event)
+    {
+        key = event.GetKeyCode();
+    }
+
+    void OnMouse(wxMouseEvent& event)
+    {
+        xMouse = event.GetPosition().x;
+        yMouse = event.GetPosition().y;
+        SetFocus();
+        if (mouseCB != NULL)
+        {
+            int type = 0, flag = 0;
+            auto t = evtWX2CVtypes.get()->find(event.GetEventType());
+            auto f = evtWX2CVflags.get()->find(event.m_altDown);
+            if (t != evtWX2CVtypes.get()->end())
+                type = t->second;
+            if (f != evtWX2CVflags.get()->end())
+                flag = f->second;
+            (*mouseCB)(type, xMouse, yMouse, flag, userdata);
+        }
+        //        eventMouse = event.GetKeyCode();
+    }
+
+    void OnPaint(wxPaintEvent& WXUNUSED(event))
+    {
+        wxPaintDC dc(this);
+
+        dc.Clear();
+
+        dc.SetUserScale(m_zoom, m_zoom);
+
+        const wxSize size = GetClientSize();
+        dc.DrawBitmap(m_bitmap,
+            dc.DeviceToLogicalX(0),
+            dc.DeviceToLogicalY(0),
+            true /* use mask */
+        );
+/*        dc.DrawBitmap(m_bitmap,
+            dc.DeviceToLogicalX((size.x - m_zoom * m_bitmap.GetWidth()) / 2),
+            dc.DeviceToLogicalY((size.y - m_zoom * m_bitmap.GetHeight()) / 2),
+            true 
+        );*/
+    }
+
+    void OnSave(wxCommandEvent& WXUNUSED(event))
+    {
+    }
+
+    void OnResize(wxCommandEvent& WXUNUSED(event))
+    {
+        wxImage img(m_bitmap.ConvertToImage());
+
+        const wxSize size = GetClientSize();
+        img.Rescale(size.x, size.y, wxIMAGE_QUALITY_HIGH);
+        m_bitmap = wxBitmap(img);
+
+    }
+
+    void OnZoom(wxCommandEvent& event)
+    {
+        if (event.GetId() == wxID_ZOOM_IN)
+            m_zoom *= 1.2;
+        else if (event.GetId() == wxID_ZOOM_OUT)
+            m_zoom /= 1.2;
+        else // wxID_ZOOM_100
+            m_zoom = 1.;
+
+    }
+
+    void OnRotate(wxCommandEvent& event)
+    {
+        double angle = 5;
+        if (event.GetId() == ID_ROTATE_LEFT)
+            angle = -angle;
+
+        wxImage img(m_bitmap.ConvertToImage());
+        img = img.Rotate(angle, wxPoint(img.GetWidth() / 2, img.GetHeight() / 2));
+        if (!img.IsOk())
+        {
+            wxLogWarning(wxT("Rotation failed"));
+            return;
+        }
+
+        m_bitmap = wxBitmap(img);
+
+    }
+
+private:
+    wxPoint posImage;
+    wxBitmap m_bitmap;
+    double m_zoom;
+    int key;
+    int xMouse, yMouse;
+    int eventMouse;
+    int flagsMouse;
+    wxNano::MouseCallback mouseCB;
+    void *userdata;
+    wxWindowID id;
+
+};
 
 
 class ocvFrame : public wxFrame
@@ -84,33 +237,65 @@ class ocvFrame : public wxFrame
 public:
     ocvFrame(wxFrame *parent, const wxString& desc, const wxImage& image, double scale = 1.0)
     {
-        mouseCB = NULL;
-        userdata = NULL;
+
+        InitOcvframe();
         Create(parent, desc, wxBitmap(image, wxBITMAP_SCREEN_DEPTH, scale),
             image.GetImageCount(desc));
-        Bind(wxEVT_PAINT, &ocvFrame::OnPaint, this);
-        Bind(wxEVT_MOTION, &ocvFrame::OnMouse, this);
-        Bind(wxEVT_ERASE_BACKGROUND, &ocvFrame::OnEraseBackground, this);
-        Bind(wxEVT_KEY_DOWN, &ocvFrame::OnKey, this);
+        panel = new wxPanel(this, -1);
+        panel->Show();
+        wxSize s(image.GetWidth(), image.GetHeight());
+        wxPoint p(0, 0);
+        ocv = new ocvImage(panel, desc, image,p,s);
+        ocv->Move(p);
+        ocv->Show(true);
+        panel->Fit();
+
     }
 
-    ocvFrame(wxFrame *parent, const wxString& desc, const wxBitmap& bitmap)
+    void createTrackbar(const std::string &trackbarname, int *value, int count, wxNano::TrackbarCallback onChange, void *userdata)
     {
-        mouseCB = NULL;
-        userdata = NULL;
-        Create(parent, desc, bitmap);
-        Bind(wxEVT_PAINT, &ocvFrame::OnPaint, this);
-        Bind(wxEVT_ERASE_BACKGROUND, &ocvFrame::OnEraseBackground, this);
-        Bind(wxEVT_KEY_DOWN, &ocvFrame::OnKey, this);
+        if (sliderList.get()->find(trackbarname) != sliderList.get()->end())
+            return;
+        wxPoint p(0, 0);
+        p.y += sliderList.get()->size() * 20;
+        wxSize s=ocv->GetClientSize();
+        s.SetHeight(20);
+        wxSlider *sl = new wxSlider(panel, id++, *value, 0, 100,p,s);
+        sl->SetName(wxString(trackbarname));
+        sl->Show(true);
+        p.y += s.GetHeight();
+        ocv->MoveImage(p);
+        ocv->Move(p);
+        sliderList.get()->insert(std::make_pair(trackbarname, sl));
+        Refresh(true);
     }
-    int GetKey() { int c = key; key = 0; return c; };
-    void setMouseCallback(wxNano::MouseCallback om, void *ud = 0)
+    void OnClose(wxCloseEvent& event)
     {
-        userdata = ud;
-        mouseCB = om;
+        delete ocv;
+        delete panel;
+        Destroy();
     }
 
 private:
+    void InitOcvframe()
+    {
+        mouseCB = NULL;
+        userdata = NULL;
+        sliderList = std::make_shared<std::map<std::string, wxSlider*>>();
+        id = 100;
+    }
+    void BindEvent(void)
+    {
+        Bind(wxEVT_CLOSE_WINDOW, &ocvFrame::OnClose, this);
+/*        Bind(wxEVT_LEFT_DOWN, &ocvFrame::OnMouse, this);
+        Bind(wxEVT_RIGHT_DOWN, &ocvFrame::OnMouse, this);
+        Bind(wxEVT_RIGHT_DOWN, &ocvFrame::OnMouse, this);
+        Bind(wxEVT_LEFT_UP, &ocvFrame::OnMouse, this);
+        Bind(wxEVT_RIGHT_UP, &ocvFrame::OnMouse, this);
+        Bind(wxEVT_RIGHT_UP, &ocvFrame::OnMouse, this);
+        Bind(wxEVT_ERASE_BACKGROUND, &ocvFrame::OnEraseBackground, this);
+        Bind(wxEVT_KEY_DOWN, &ocvFrame::OnKey, this);*/
+    }
     bool Create(wxFrame *parent,
         const wxString& desc,
         const wxBitmap& bitmap,
@@ -121,8 +306,7 @@ private:
             wxDefaultPosition, wxDefaultSize,
             wxDEFAULT_FRAME_STYLE | wxFULL_REPAINT_ON_RESIZE))
             return false;
-
-        m_bitmap = bitmap;
+//        m_bitmap = bitmap;
         m_zoom = 1.;
 
         wxMenu *menu = new wxMenu;
@@ -150,7 +334,6 @@ private:
             SetStatusText(wxString::Format("%d images", numImages), 1);
 
         SetClientSize(bitmap.GetWidth(), bitmap.GetHeight());
-
         UpdateStatusBar();
 
         Show();
@@ -181,28 +364,14 @@ private:
                 type = t->second;
             if (f != evtWX2CVflags.get()->end())
                 flag = f->second;
-            (*mouseCB)(type,xMouse, yMouse, flag, userdata);
+            (*mouseCB)(type, xMouse, yMouse, flag, userdata);
         }
-//        eventMouse = event.GetKeyCode();
+        //        eventMouse = event.GetKeyCode();
     }
 
     void OnPaint(wxPaintEvent& WXUNUSED(event))
     {
-        wxPaintDC dc(this);
-
-        if (GetMenuBar()->IsChecked(ID_PAINT_BG))
-            dc.Clear();
-
-        dc.SetUserScale(m_zoom, m_zoom);
-
-        const wxSize size = GetClientSize();
-        dc.DrawBitmap
-        (
-            m_bitmap,
-            dc.DeviceToLogicalX((size.x - m_zoom * m_bitmap.GetWidth()) / 2),
-            dc.DeviceToLogicalY((size.y - m_zoom * m_bitmap.GetHeight()) / 2),
-            true /* use mask */
-        );
+        return;
     }
 
     void OnSave(wxCommandEvent& WXUNUSED(event))
@@ -211,13 +380,13 @@ private:
 
     void OnResize(wxCommandEvent& WXUNUSED(event))
     {
-        wxImage img(m_bitmap.ConvertToImage());
+/*        wxImage img(m_bitmap.ConvertToImage());
 
         const wxSize size = GetClientSize();
         img.Rescale(size.x, size.y, wxIMAGE_QUALITY_HIGH);
         m_bitmap = wxBitmap(img);
 
-        UpdateStatusBar();
+        UpdateStatusBar();*/
     }
 
     void OnZoom(wxCommandEvent& event)
@@ -234,33 +403,22 @@ private:
 
     void OnRotate(wxCommandEvent& event)
     {
-        double angle = 5;
-        if (event.GetId() == ID_ROTATE_LEFT)
-            angle = -angle;
-
-        wxImage img(m_bitmap.ConvertToImage());
-        img = img.Rotate(angle, wxPoint(img.GetWidth() / 2, img.GetHeight() / 2));
-        if (!img.IsOk())
-        {
-            wxLogWarning(wxT("Rotation failed"));
-            return;
-        }
-
-        m_bitmap = wxBitmap(img);
-
-        UpdateStatusBar();
     }
 
     void UpdateStatusBar()
     {
-        wxLogStatus(this, wxT("Image size: (%d, %d), zoom %.2f"),
+/*        wxLogStatus(this, wxT("Image size: (%d, %d), zoom %.2f"),
             m_bitmap.GetWidth(),
             m_bitmap.GetHeight(),
-            m_zoom);
+            m_zoom);*/
         Refresh();
     }
-    private:
-    wxBitmap m_bitmap;
+public :
+    ocvImage *ocv;
+    wxPanel *panel;
+private:
+    wxFrame * frameCtrl;
+//    wxBitmap m_bitmap;
     double m_zoom;
     int key;
     int xMouse, yMouse;
@@ -268,8 +426,13 @@ private:
     int flagsMouse;
     wxNano::MouseCallback mouseCB;
     void *userdata;
+    std::shared_ptr<std::map<std::string, wxSlider*>> sliderList;
+    wxWindowID id;
 
 };
+
+
+
 
 namespace wxNano {
 
@@ -311,7 +474,7 @@ namespace wxNano {
         for (auto q : *winList.get())
         {
             std::shared_ptr<ocvFrame> o = q.second;
-            c = o.get()->GetKey();
+            c = o.get()->ocv->GetKey();
             if (c)
                 return c;
         }
@@ -325,7 +488,8 @@ namespace wxNano {
         for (auto q : *winList.get())
         {
             std::shared_ptr<ocvFrame> o = q.second;
-            q.second->Close(true);
+            wxCloseEvent w(wxEVT_CLOSE_WINDOW, -1);
+            q.second->OnClose(w);
         }
         winList.get()->clear();
     }
@@ -336,18 +500,28 @@ namespace wxNano {
         auto q = winList.get()->find(winname);
         if (q != winList.get()->end())
         {
-            q->second.get()->Close(true);
+            wxCloseEvent w(wxEVT_CLOSE_WINDOW, -1);
+            q->second.get()->OnClose(w);
             winList.get()->erase(winname);
 
         }
 
     }
-    void setMouseCallback(const std::string &winname, MouseCallback onMouse, void *userdata = 0)
+    void setMouseCallback(const std::string &winname, MouseCallback onMouse, void *userdata)
     {
         auto q = winList.get()->find(winname);
         if (q != winList.get()->end())
         {
-            q->second.get()->setMouseCallback(onMouse, userdata);
+            q->second.get()->ocv->setMouseCallback(onMouse, userdata);
+        }
+
+    }
+    void createTrackbar(const std::string &trackbarname, const std::string &winname, int *value, int count, TrackbarCallback onChange, void *userdata)
+    {
+        auto q = winList.get()->find(winname);
+        if (q != winList.get()->end())
+        {
+            q->second.get()->createTrackbar(trackbarname, value, count,onChange, userdata);
         }
 
     }
