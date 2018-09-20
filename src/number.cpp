@@ -266,8 +266,10 @@ public:
         p.y += s.GetHeight();
         ocv->MoveImage(p);
         ocv->Move(p);
-        sliderList.get()->insert(std::make_pair(trackbarname, sl));
+        sliderList.get()->insert(std::make_pair(trackbarname, wxNano::TrackbarManager{ sl, onChange, userdata }));
+        BindEvent();
         Refresh(true);
+
     }
     void OnClose(wxCloseEvent& event)
     {
@@ -281,13 +283,14 @@ private:
     {
         mouseCB = NULL;
         userdata = NULL;
-        sliderList = std::make_shared<std::map<std::string, wxSlider*>>();
+        sliderList = std::make_shared<std::map<std::string, wxNano::TrackbarManager>>();
         id = 100;
     }
     void BindEvent(void)
     {
         Bind(wxEVT_CLOSE_WINDOW, &ocvFrame::OnClose, this);
-/*        Bind(wxEVT_LEFT_DOWN, &ocvFrame::OnMouse, this);
+        Bind(wxEVT_SLIDER, &ocvFrame::OnSlider, this);
+        /*        Bind(wxEVT_LEFT_DOWN, &ocvFrame::OnMouse, this);
         Bind(wxEVT_RIGHT_DOWN, &ocvFrame::OnMouse, this);
         Bind(wxEVT_RIGHT_DOWN, &ocvFrame::OnMouse, this);
         Bind(wxEVT_LEFT_UP, &ocvFrame::OnMouse, this);
@@ -404,6 +407,24 @@ private:
     void OnRotate(wxCommandEvent& event)
     {
     }
+    
+    void OnSlider(wxCommandEvent & event)
+    {
+        wxSlider *s=(wxSlider*)(event.GetEventObject());
+        wxString name = s->GetName();
+        auto q = sliderList.get();
+        
+        if (q!=NULL)
+        {
+            auto p = q->find(std::string(name.c_str()));
+            if (p != sliderList.get()->end())
+            {
+                wxNano::TrackbarManager t = p->second;
+                if (t.fct)
+                    (*t.fct)(s->GetValue(), t.user);
+            }
+        }
+    }
 
     void UpdateStatusBar()
     {
@@ -426,7 +447,7 @@ private:
     int flagsMouse;
     wxNano::MouseCallback mouseCB;
     void *userdata;
-    std::shared_ptr<std::map<std::string, wxSlider*>> sliderList;
+    std::shared_ptr<std::map<std::string, wxNano::TrackbarManager >> sliderList;
     wxWindowID id;
 
 };

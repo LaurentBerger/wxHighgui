@@ -14,6 +14,14 @@ namespace wxNano {
 typedef void(*MouseCallback) (int event, int x, int y, int flags, void *userdata);
 typedef void(*TrackbarCallback) (int pos, void *userdata);
 
+struct TrackbarManager
+{
+    wxSlider *s;
+    TrackbarCallback fct;
+    void *user;
+};
+
+
 template<typename T>T GetNumber(std::string texte1 = std::string(), std::string texte2 = std::string(), std::string texte3 = std::string())
 {
     T x;

@@ -14,6 +14,11 @@ void onMouse(int evt, int x, int y, int flags, void *f)
         std::cout << evt << " EVENT_LBUTTONUP " << x << " " << y << " " << flags << "\n";
 }
 
+void onTrackbar(int pos, void *userdata)
+{
+    std::cout << pos << "\n";
+}
+
 int main(int argc,char**argv)
 {
     
@@ -29,6 +34,7 @@ int main(int argc,char**argv)
  
     std::string s = wxNano::GetFileName();
     cv::Mat img = cv::imread(s.c_str());
+//    myGui::namedWindow()
     myGui::imshow(s.c_str(), img);
 /*    s = wxNano::GetFileName();
     cv::Mat img2 = cv::imread(s.c_str());
@@ -50,7 +56,7 @@ int main(int argc,char**argv)
         code = myGui::waitKey(1000);
         if (code == 'A')
         {
-            myGui::createTrackbar(cv::format("test%d",j++), s.c_str(), &valeur, 256);
+            myGui::createTrackbar(cv::format("test%d",j++), s.c_str(), &valeur, 256,onTrackbar);
             std::cout << "trackbar " << j << "\n";
         }
         else  if (code)
