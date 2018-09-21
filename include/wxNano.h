@@ -41,6 +41,7 @@ template<>double GetNumber<double>(std::string texte1, std::string texte2, std::
 std::string GetFileName();
 int waitKey(int tps);
 void imshow(const std::string &  	winname, cv::InputArray  	mat);
+void namedWindow(const std::string &winname, int  	flags = cv::WINDOW_AUTOSIZE);
 void destroyAllWindows();
 void destroyWindow(const std::string &  	winname);
 void setMouseCallback(const std::string &winname, MouseCallback onMouse, void *userdata = NULL);

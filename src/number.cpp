@@ -78,8 +78,8 @@ enum
 class ocvImage : public  wxWindow
 {
 public:
-    ocvImage(wxPanel *parent, const wxString& desc, const wxImage& image,const wxPoint pos,  const wxSize& s, double scale = 1.0):
-        wxWindow(parent,-1,pos,s)
+    ocvImage(wxPanel *parent, const wxString& desc, const wxImage& image, const wxPoint pos, const wxSize& s, double scale = 1.0) :
+        wxWindow(parent, -1, pos, s)
     {
         posImage = pos;
         InitOcvImage();
@@ -87,7 +87,20 @@ public:
         m_bitmap = wxBitmap(image, wxBITMAP_SCREEN_DEPTH, scale);
     }
 
-    int GetKey() 
+    ocvImage(wxPanel *parent, const wxString& desc, const wxPoint pos, const wxSize& s, double scale = 1.0) :
+        wxWindow(parent, -1, pos, s)
+    {
+        posImage = pos;
+        InitOcvImage();
+        BindEvent();
+        m_bitmap = wxBitmap();
+    }
+
+    void setImage(const wxImage& image)
+    {
+        m_bitmap = wxBitmap(image, wxBITMAP_SCREEN_DEPTH, 1.0);
+    }
+    int GetKey()
     { 
         int c = key; 
         key = 0; 
@@ -239,8 +252,7 @@ public:
     {
 
         InitOcvframe();
-        Create(parent, desc, wxBitmap(image, wxBITMAP_SCREEN_DEPTH, scale),
-            image.GetImageCount(desc));
+        Create(parent, desc, wxBitmap(image, wxBITMAP_SCREEN_DEPTH, scale));
         panel = new wxPanel(this, -1);
         panel->Show();
         wxSize s(image.GetWidth(), image.GetHeight());
@@ -248,6 +260,38 @@ public:
         ocv = new ocvImage(panel, desc, image,p,s);
         ocv->Move(p);
         ocv->Show(true);
+        panel->Fit();
+
+    }
+    ocvFrame(wxFrame *parent, const wxString& desc)
+    {
+
+        InitOcvframe();
+        Create(parent, desc);
+        panel = new wxPanel(this, -1);
+        panel->Show();
+        wxSize s(0, 0);
+        wxPoint p(0, 0);
+        ocv = new ocvImage(panel, desc, p, s);
+        ocv->Move(p);
+        ocv->Show(true);
+        panel->Fit();
+
+    }
+
+    void MatUpdate(const wxImage& image, const wxString& desc)
+    {
+
+        wxSize s(image.GetWidth(), image.GetHeight());
+        wxSize sa= GetSize();
+        s = wxSize(std::max(sa.GetWidth(), s.GetWidth()), std::max(sa.GetHeight(), s.GetHeight()));
+        SetSize(s);
+        ocv->SetSize(s);
+//        wxPoint p(0, 0);
+        ocv->setImage(image);
+//        ocv->Move(p);
+        ocv->Show(true);
+        ocv->Refresh(true);
         panel->Fit();
 
     }
@@ -301,15 +345,26 @@ private:
     }
     bool Create(wxFrame *parent,
         const wxString& desc,
-        const wxBitmap& bitmap,
-        int numImages = 1)
+        const wxBitmap& bitmap)
+    {
+        Create(parent, desc);
+
+        SetClientSize(bitmap.GetWidth(), bitmap.GetHeight());
+        UpdateStatusBar();
+
+        Show();
+
+        return true;
+    }
+
+    bool Create(wxFrame *parent,
+        const wxString& desc)
     {
         if (!wxFrame::Create(parent, wxID_ANY,
             wxString::Format(wxT("Image from %s"), desc),
             wxDefaultPosition, wxDefaultSize,
             wxDEFAULT_FRAME_STYLE | wxFULL_REPAINT_ON_RESIZE))
             return false;
-//        m_bitmap = bitmap;
         m_zoom = 1.;
 
         wxMenu *menu = new wxMenu;
@@ -333,16 +388,16 @@ private:
         mbar->Check(ID_PAINT_BG, true);
 
         CreateStatusBar(2);
-        if (numImages != 1)
-            SetStatusText(wxString::Format("%d images", numImages), 1);
+        SetStatusText("images", 1);
 
-        SetClientSize(bitmap.GetWidth(), bitmap.GetHeight());
+        SetClientSize(300, 300);
         UpdateStatusBar();
 
         Show();
 
         return true;
     }
+
 
     void OnEraseBackground(wxEraseEvent& WXUNUSED(event))
     {
@@ -457,19 +512,44 @@ private:
 
 namespace wxNano {
 
+    void namedWindow(const std::string &winname, int  	flags )
+    {
+        if (winList.get() == NULL)
+            winList = std::make_shared<std::map<std::string, std::shared_ptr<ocvFrame>>>();
+        if (winList.get()->find(winname) != winList.get()->end())
+            return;
+        const wxString desc(winname);
+
+        std::shared_ptr<ocvFrame> x = std::make_shared<ocvFrame>((wxFrame*)NULL, winname);
+        winList.get()->insert(make_pair(winname, x));
+        x.get()->Show(false);
+    }
+
     void imshow(const std::string &winname, cv::InputArray  	mat)
     {
         if (winList.get() == NULL)
             winList = std::make_shared<std::map<std::string, std::shared_ptr<ocvFrame>>>();
         const wxString desc(winname);
-        cv::Mat img = mat.getMat();
-        wxImage *image = new wxImage(wxSize(img.cols,img.rows));
-        image->SetMask(0);
-        image->SetData(img.ptr(0), true);
-
-        std::shared_ptr<ocvFrame> x = std::make_shared<ocvFrame>((wxFrame*)NULL, desc, *image, 1.0);
-        winList.get()->insert(make_pair(winname, x));
-        x.get()->Show();
+        cv::Mat img = mat.getMat(),imgrgb;
+        if (img.channels()!=1)
+            cvtColor(img, imgrgb, cv::COLOR_BGR2RGB);
+        else
+            cvtColor(img, imgrgb, cv::COLOR_GRAY2RGB);
+        wxImage image(wxSize(img.cols, img.rows));
+        image.SetMask(0);
+        image.SetData(imgrgb.ptr(0), true);
+        std::shared_ptr<ocvFrame> x;
+        if (winList.get()->find(winname) != winList.get()->end())
+        {
+            x = winList.get()->find(winname)->second;
+            x->MatUpdate(image,winname);
+        }
+        else
+        {
+            x = std::make_shared<ocvFrame>((wxFrame*)NULL, desc, image, 1.0);
+            winList.get()->insert(make_pair(winname, x));
+        }
+        x.get()->Show(true);
     }
 
     std::string GetFileName()
