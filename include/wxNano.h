@@ -3,11 +3,15 @@
 #include "wx/wx.h"
 #include <wx/numdlg.h>
 #include<string>
+#include<vector>
+#include<map>
 #include<memory>
-#include<opencv2/opencv.hpp>
+#include<opencv2/core.hpp>
+#include<opencv2/highgui.hpp>
+#include<opencv2/imgproc.hpp>
 
 
-std::shared_ptr<wxInitializer> InitWX(int , char **);
+std::shared_ptr<wxInitializer> InitWX(int, char **);
 
 namespace wxNano {
 
@@ -39,14 +43,23 @@ template<typename T>T GetNumber(std::string texte1 = std::string(), std::string 
 template<>double GetNumber<double>(std::string texte1, std::string texte2, std::string texte3);
 
 std::string GetFileName();
-int waitKey(int tps);
+int waitKey(int tps=0);
+int waitKeyEx(int delay = 0);
 void imshow(const std::string &  	winname, cv::InputArray  	mat);
 void namedWindow(const std::string &winname, int  	flags = cv::WINDOW_AUTOSIZE);
 void destroyAllWindows();
 void destroyWindow(const std::string &  	winname);
 void setMouseCallback(const std::string &winname, MouseCallback onMouse, void *userdata = NULL);
 void createTrackbar(const std::string &trackbarname, const std::string &winname, int *value, int count, TrackbarCallback onChange=NULL, void *userdata=NULL);
-
+int getMouseWheelDelta(int flags);
+int getTrackbarPos(const std::string &trackbarname, const std::string &winname);
+void moveWindow(const std::string &winname, int x, int y);
+void resizeWindow(const std::string &winname, int x, int y);
+void resizeWindow(const std::string &winname, cv::Size &size);
+void setTrackbarMax(const std::string &trackbarname, const std::string &winname, int maxval);
+void setTrackbarMin(const std::string &trackbarname, const std::string &winname, int minval);
+void setTrackbarPos(const std::string &trackbarname, const std::string &winname, int pos);
+void setWindowTitle(const std::string &winname, const std::string &title);
 };
 
 

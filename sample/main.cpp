@@ -1,4 +1,8 @@
-﻿#include "wxNano.h"
+﻿/*#define _CRTDBG_MAP_ALLOC  
+#include <stdlib.h>  
+#include <crtdbg.h>  */
+
+#include "wxNano.h"
 #include<iostream>
 #include<string>
 
@@ -31,10 +35,11 @@ void onTrackbar(int pos, void *userdata)
 
 int main(int argc,char**argv)
 {
-    
+/*    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+    _CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
+    _CrtSetBreakAlloc(10763);    */
     int l1 = wxNano::GetNumber<int>();
     std::cout << "First number " << l1 << "\n";
-   
 /*    unsigned char luc = wxNano::GetNumber<unsigned char>();
     std::cout << "First number " << luc << "\n";
     short ls = wxNano::GetNumber<short>();
@@ -43,17 +48,17 @@ int main(int argc,char**argv)
     std::cout << "Second number " << l2 << "\n";*/
  
     std::string s = wxNano::GetFileName();
-    cv::Mat img = cv::imread(s.c_str());
-    myGui::namedWindow(s.c_str());
-    myGui::imshow(s.c_str(), img);
+    cv::Mat img = cv::imread(s);
+    myGui::namedWindow(s);
+    myGui::imshow(s, img);
     s = wxNano::GetFileName();
-    cv::Mat img2 = cv::imread(s.c_str());
-    myGui::imshow(s.c_str(), img2);
-    myGui::setMouseCallback(s.c_str(),onMouse,NULL);
+    cv::Mat img2 = cv::imread(s);
+    myGui::imshow(s, img2);
+    myGui::setMouseCallback(s,onMouse,NULL);
     int code = 0;
     do
     {
-        code = myGui::waitKey(1000);
+        code = myGui::waitKey(40);
         if (code)
             std::cout << code << "\n";
     } 
@@ -66,7 +71,7 @@ int main(int argc,char**argv)
     myStruct.winname = s;
     do
     {
-        code = myGui::waitKey(1000);
+        code = myGui::waitKeyEx(40);
         if (code == 'A')
         {
             myGui::createTrackbar(cv::format("test%d",j++), s.c_str(), &valeur, 256,onTrackbar,&myStruct);
@@ -79,6 +84,6 @@ int main(int argc,char**argv)
 
     myGui::destroyWindow("myWxImage");
     myGui::destroyAllWindows();
-
+    _CrtDumpMemoryLeaks();
     return 0;
 }

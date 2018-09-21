@@ -98,6 +98,7 @@ public:
 
     void setImage(const wxImage& image)
     {
+        
         m_bitmap = wxBitmap(image, wxBITMAP_SCREEN_DEPTH, 1.0);
     }
     int GetKey()
@@ -134,7 +135,7 @@ private:
         Bind(wxEVT_RIGHT_UP, &ocvImage::OnMouse, this);
         Bind(wxEVT_RIGHT_UP, &ocvImage::OnMouse, this);
         Bind(wxEVT_ERASE_BACKGROUND, &ocvImage::OnEraseBackground, this);
-        Bind(wxEVT_KEY_DOWN, &ocvImage::OnKey, this);
+        Bind(wxEVT_CHAR, &ocvImage::OnKey, this);
     }
 
     void OnEraseBackground(wxEraseEvent& WXUNUSED(event))
@@ -145,6 +146,7 @@ private:
     void OnKey(wxKeyEvent& event)
     {
         key = event.GetKeyCode();
+ //       key = event.GetUnicodeKey();
     }
 
     void OnMouse(wxMouseEvent& event)
@@ -283,10 +285,12 @@ public:
     {
 
         wxSize s(image.GetWidth(), image.GetHeight());
-        wxSize sa= GetSize();
-        s = wxSize(std::max(sa.GetWidth(), s.GetWidth()), std::max(sa.GetHeight(), s.GetHeight()));
-        SetSize(s);
-        ocv->SetSize(s);
+        wxSize sa= ocv->GetSize();
+        if (sa.GetWidth() == 0)
+        {
+            SetSize(s);
+            ocv->SetSize(s);
+        }
 //        wxPoint p(0, 0);
         ocv->setImage(image);
 //        ocv->Move(p);
@@ -577,10 +581,25 @@ namespace wxNano {
             std::shared_ptr<ocvFrame> o = q.second;
             c = o.get()->ocv->GetKey();
             if (c)
+                return c&0xFF;
+        }
+        return c;
+    }
+
+    int waitKeyEx(int tps)
+    {
+        eventLoop->DispatchTimeout(tps);
+        int c = 0;
+        for (auto q : *winList.get())
+        {
+            std::shared_ptr<ocvFrame> o = q.second;
+            c = o.get()->ocv->GetKey();
+            if (c)
                 return c;
         }
         return c;
     }
+
 
     void destroyAllWindows()
     {
