@@ -102,10 +102,16 @@ public:
         m_bitmap = wxBitmap(image, wxBITMAP_SCREEN_DEPTH, 1.0);
     }
     int GetKey()
-    { 
-        int c = key; 
-        key = 0; 
-        return c; 
+    {
+        int c = key;
+        key = 0;
+        return c;
+    }
+    int GetMouseWheelDelta()
+    {
+        int d = delta;
+        delta = 0;
+        return d;
     };
     void setMouseCallback(wxNano::MouseCallback om, void *ud = 0)
     {
@@ -136,6 +142,7 @@ private:
         Bind(wxEVT_RIGHT_UP, &ocvImage::OnMouse, this);
         Bind(wxEVT_ERASE_BACKGROUND, &ocvImage::OnEraseBackground, this);
         Bind(wxEVT_CHAR, &ocvImage::OnKey, this);
+        Bind(wxEVT_MOUSEWHEEL, &ocvImage::OnMouse, this);
     }
 
     void OnEraseBackground(wxEraseEvent& WXUNUSED(event))
@@ -154,6 +161,11 @@ private:
         xMouse = event.GetPosition().x;
         yMouse = event.GetPosition().y;
         SetFocus();
+        if (event.GetEventType() == wxEVT_MOUSEWHEEL)
+        {
+            delta = event.GetWheelRotation();
+            wxMouseWheelAxis a= event.GetWheelAxis();
+        }
         if (mouseCB != NULL)
         {
             int type = 0, flag = 0;
@@ -240,6 +252,8 @@ private:
     int xMouse, yMouse;
     int eventMouse;
     int flagsMouse;
+    int delta;
+
     wxNano::MouseCallback mouseCB;
     void *userdata;
     wxWindowID id;
@@ -485,6 +499,20 @@ private:
         }
     }
 
+    int GetTrackBar(const std::string &trackname)
+    {
+        auto q = sliderList.get();
+        if (q != NULL)
+        {
+            auto p = q->find(trackname);
+            if (p != sliderList.get()->end())
+            {
+                wxNano::TrackbarManager t = p->second;
+                return t.s->GetValue();
+            }
+        }
+    }
+
     void UpdateStatusBar()
     {
 /*        wxLogStatus(this, wxT("Image size: (%d, %d), zoom %.2f"),
@@ -496,6 +524,7 @@ private:
 public :
     ocvImage *ocv;
     wxPanel *panel;
+    std::shared_ptr<std::map<std::string, wxNano::TrackbarManager >> sliderList;
 private:
     wxFrame * frameCtrl;
 //    wxBitmap m_bitmap;
@@ -506,7 +535,6 @@ private:
     int flagsMouse;
     wxNano::MouseCallback mouseCB;
     void *userdata;
-    std::shared_ptr<std::map<std::string, wxNano::TrackbarManager >> sliderList;
     wxWindowID id;
 
 };
@@ -581,7 +609,20 @@ namespace wxNano {
             std::shared_ptr<ocvFrame> o = q.second;
             c = o.get()->ocv->GetKey();
             if (c)
-                return c&0xFF;
+                return c & 0xFF;
+        }
+        return c;
+    }
+
+    int getMouseWheelDelta()
+    {
+        int c = 0;
+        for (auto q : *winList.get())
+        {
+            std::shared_ptr<ocvFrame> o = q.second;
+            c = o.get()->ocv->GetMouseWheelDelta();
+            if (c)
+                return c ;
         }
         return c;
     }
@@ -642,6 +683,91 @@ namespace wxNano {
         if (q != winList.get()->end())
         {
             q->second.get()->createTrackbar(trackbarname, value, count,onChange, userdata);
+        }
+    }
+    int  getTrackbarPos(const std::string &trackbarname, const std::string &winname)
+    {
+        auto q = winList.get()->find(winname);
+        if (q != winList.get()->end())
+        {
+            auto s = q->second.get()->sliderList.get()->find(trackbarname);
+            if (s != q->second.get()->sliderList.get()->end())
+            {
+                return s->second.s->GetValue();
+            }
+        }
+        return 0;
+    }
+
+    void moveWindow(const std::string &winname, int x, int y)
+    {
+        auto q = winList.get()->find(winname);
+        if (q != winList.get()->end())
+        {
+            q->second.get()->Move(x, y);
+
+        }
+
+    }
+    void resizeWindow(const std::string &winname, int x, int y)
+    {
+        auto q = winList.get()->find(winname);
+        if (q != winList.get()->end())
+        {
+            q->second.get()->SetSize(x, y);
+        }
+    }
+
+    void resizeWindow(const std::string &winname, cv::Size s)
+    {
+        auto q = winList.get()->find(winname);
+        if (q != winList.get()->end())
+        {
+            q->second.get()->SetSize(s.width, s.height);
+        }
+    }
+    void setTrackbarMax(const std::string &trackbarname, const std::string &winname, int maxval)
+    {
+        auto q = winList.get()->find(winname);
+        if (q != winList.get()->end())
+        {
+            auto s = q->second.get()->sliderList.get()->find(trackbarname);
+            if (s != q->second.get()->sliderList.get()->end())
+            {
+                s->second.s->SetMax(maxval);
+            }
+        }
+    }
+    void setTrackbarMin(const std::string &trackbarname, const std::string &winname, int minval)
+    {
+        auto q = winList.get()->find(winname);
+        if (q != winList.get()->end())
+        {
+            auto s = q->second.get()->sliderList.get()->find(trackbarname);
+            if (s != q->second.get()->sliderList.get()->end())
+            {
+                s->second.s->SetMin(minval);
+            }
+        }
+    }
+    void setTrackbarPos(const std::string &trackbarname, const std::string &winname, int pos)
+    {
+        auto q = winList.get()->find(winname);
+        if (q != winList.get()->end())
+        {
+            auto s = q->second.get()->sliderList.get()->find(trackbarname);
+            if (s != q->second.get()->sliderList.get()->end())
+            {
+                s->second.s->SetValue(pos);
+            }
+        }
+    }
+    void setWindowTitle(const std::string &winname, const std::string &title)
+    {
+        auto q = winList.get()->find(winname);
+        if (q != winList.get()->end())
+        {
+            q->second.get()->SetTitle(title);
         }
 
     }

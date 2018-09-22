@@ -21,6 +21,11 @@ void onMouse(int evt, int x, int y, int flags, void *f)
         std::cout << evt << " EVENT_LBUTTONDOWN " << x << " " << y << " " << flags << "\n";
     if (evt == cv::EVENT_LBUTTONUP)
         std::cout << evt << " EVENT_LBUTTONUP " << x << " " << y << " " << flags << "\n";
+    if (evt == cv::EVENT_MOUSEWHEEL)
+        std::cout << evt << " EVENT_MOUSEWHEEL " << myGui::getMouseWheelDelta() << "\n";
+    if (evt == cv::EVENT_MOUSEHWHEEL)
+        std::cout << evt << " EVENT_MOUSEHWHEEL " << myGui::getMouseWheelDelta() <<  "\n";
+    
 }
 
 void onTrackbar(int pos, void *userdata)
@@ -47,11 +52,14 @@ int main(int argc,char**argv)
     double l2 = wxNano::GetNumber<double>("texte1","texte2");
     std::cout << "Second number " << l2 << "\n";*/
  
+    std::string s1 = wxNano::GetFileName();
+    cv::Mat img = cv::imread(s1);
+    myGui::namedWindow(s1);
+    myGui::imshow(s1, img);
+    int valRef = 3;
+    std::string trackname("REF");
+    myGui::createTrackbar(trackname, s1, &valRef, 256);
     std::string s = wxNano::GetFileName();
-    cv::Mat img = cv::imread(s);
-    myGui::namedWindow(s);
-    myGui::imshow(s, img);
-    s = wxNano::GetFileName();
     cv::Mat img2 = cv::imread(s);
     myGui::imshow(s, img2);
     myGui::setMouseCallback(s,onMouse,NULL);
@@ -60,7 +68,11 @@ int main(int argc,char**argv)
     {
         code = myGui::waitKey(40);
         if (code)
-            std::cout << code << "\n";
+        {
+            std::cout << code <<"\t"<<myGui::getTrackbarPos(trackname,s1) << "\n";
+            myGui::moveWindow(s1, myGui::getTrackbarPos(trackname, s1), myGui::getTrackbarPos(trackname, s1) * 2);
+            myGui::resizeWindow(s1, 5*myGui::getTrackbarPos(trackname, s1)+100, 5*myGui::getTrackbarPos(trackname, s1)+100 );
+        }
     } 
     while (code != 27);
     code = 0;

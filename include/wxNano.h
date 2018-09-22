@@ -51,8 +51,9 @@ void destroyAllWindows();
 void destroyWindow(const std::string &  	winname);
 void setMouseCallback(const std::string &winname, MouseCallback onMouse, void *userdata = NULL);
 void createTrackbar(const std::string &trackbarname, const std::string &winname, int *value, int count, TrackbarCallback onChange=NULL, void *userdata=NULL);
-int getMouseWheelDelta(int flags);
+int getMouseWheelDelta();
 int getTrackbarPos(const std::string &trackbarname, const std::string &winname);
+
 void moveWindow(const std::string &winname, int x, int y);
 void resizeWindow(const std::string &winname, int x, int y);
 void resizeWindow(const std::string &winname, cv::Size &size);
