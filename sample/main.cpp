@@ -96,6 +96,18 @@ int main(int argc,char**argv)
 
     myGui::destroyWindow("myWxImage");
     myGui::destroyAllWindows();
+    cv::VideoCapture v(0);
+    if (!v.isOpened())
+        return 0;
+    cv::Mat frame;
+
+    do
+    {
+        code = myGui::waitKeyEx(40);
+        v >> frame;
+        myGui::imshow("WebCam", frame);
+    }
+    while (code != 27);
     _CrtDumpMemoryLeaks();
     return 0;
 }

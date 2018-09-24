@@ -184,7 +184,7 @@ private:
     {
         wxPaintDC dc(this);
 
-        dc.Clear();
+        //dc.Clear();
 
         dc.SetUserScale(m_zoom, m_zoom);
 
