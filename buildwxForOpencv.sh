@@ -22,8 +22,8 @@ CMAKE_OPTIONS= cmake -G"$CMAKE_CONFIG_GENERATOR" \
 -DZLIB_LIBRARY_DEBUG=${myRepo}/install/zlib/lib/zlibd.lib \
 -DZLIB_LIBRARY_RELEASE=${myRepo}/install/zlib/lib/zlib.lib \
 -DwxUSE_LIBPNG=sys -DPNG_PNG_INCLUDE_DIR=${myRepo}/install/libpng/include \
--DPNG_LIBRARY_DEBUG=${myRepo}/install/libpng/libpngd.lib \
--DPNG_LIBRARY_RELEASE=${myRepo}/install/libpng/libpng.lib \
+-DPNG_LIBRARY_DEBUG=${myRepo}/install/libpng/libpng16d.lib \
+-DPNG_LIBRARY_RELEASE=${myRepo}/install/libpng/libpng16.lib \
 -DCMAKE_INSTALL_PREFIX=../../install/"$RepoSource" ../../"$RepoSource" 
 cmake --build . --config release 
 cmake --build . --target install --config release 
