@@ -1,6 +1,5 @@
 #!/bin/bash -e 
 myRepo=$(pwd) 
-opencvInstall=${myRepo}/install/opencv
 CMAKE_CONFIG_GENERATOR="Visual Studio 15 2017 Win64" 
 if [ ! -d "$myRepo/wxwidgets" ]; 
 then echo "cloning wxwidgets" 
@@ -10,12 +9,12 @@ mkdir Install/wxwidgets
 else 
 cd wxwidgets 
 git pull --rebase 
-git submodule update --init 
-cd .. 
 fi 
+git submodule update --init 
+cd ..
 RepoSource=wxwidgets 
 pushd Build/$RepoSource 
-CMAKE_OPTIONS= cmake -G"$CMAKE_CONFIG_GENERATOR" \
+cmake -G"$CMAKE_CONFIG_GENERATOR" \
 -DwxBUILD_SHARED:BOOL=ON -DwxBUILD_USE_STATIC_RUNTIME:BOOL=OFF -DwxBUILD_COMPATIBILITY=3.1 \
 -DwxUSE_LIBTIFF=OFF -DwxUSE_LIBJPEG=OFF \
 -DwxUSE_EXPAT=builtin \
@@ -25,7 +24,8 @@ CMAKE_OPTIONS= cmake -G"$CMAKE_CONFIG_GENERATOR" \
 -DwxUSE_LIBPNG=sys -DPNG_PNG_INCLUDE_DIR=${myRepo}/install/libpng/include \
 -DPNG_LIBRARY_DEBUG=${myRepo}/install/libpng/lib/libpng16d.lib \
 -DPNG_LIBRARY_RELEASE=${myRepo}/install/libpng/lib/libpng16.lib \
--DCMAKE_INSTALL_PREFIX=../../install/"$RepoSource" ../../"$RepoSource" cmake --build . --config release 
+-DCMAKE_INSTALL_PREFIX=../../install/"$RepoSource" ../../"$RepoSource" 
+cmake --build . --config release 
 cmake --build . --target install --config release 
 cmake --build . --config debug 
 cmake --build . --target install --config debug 
