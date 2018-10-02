@@ -1,5 +1,5 @@
 #!/bin/bash -e 
-myRepo=$(pwd) 
+source ./libmodel.sh
 librepo=zlib
 CMAKE_CONFIG_GENERATOR="Visual Studio 15 2017 Win64" 
 if [ ! -d "$myRepo/$librepo" ]; 
@@ -25,7 +25,6 @@ popd
 
 
 #!/bin/bash -e 
-myRepo=$(pwd) 
 librepo=libpng
 CMAKE_CONFIG_GENERATOR="Visual Studio 15 2017 Win64" 
 if [ ! -d "$myRepo/$librepo" ]; 
