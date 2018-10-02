@@ -5,9 +5,9 @@ CMAKE_CONFIG_GENERATOR="Visual Studio 15 2017 Win64"
 RepoSource=wxnano
 cd Build/$RepoSource
 cmake -G"$CMAKE_CONFIG_GENERATOR"   \
--DBUILD_SHARED_LIBS:BOOL=OFF \
--DwxWidgets_ROOT_DIR=${myRepo}/install/wxwidgets -DwxWidgets_LIB_DIR=${myRepo}/install/wxwidgets/lib/vc_x64_lib \
--Dopencv_DIR=${myRepo}/install/opencv/x64/vc15/staticlib \
+-DBUILD_SHARED_LIBS:BOOL=ON \
+-DwxWidgets_ROOT_DIR=${myRepo}/install/wxwidgets -DwxWidgets_LIB_DIR=${myRepo}/install/wxwidgets/lib/vc_x64_dll \
+-Dopencv_DIR=${myRepo}/install/opencv \
 -DCMAKE_INSTALL_PREFIX=../../install/"$RepoSource"  ../../"$RepoSource"
 
 cd ..

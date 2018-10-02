@@ -32,9 +32,9 @@ CMAKE_CONFIG_GENERATOR="Visual Studio 15 2017 Win64"
 RepoSource=opencv
 cd Build/$RepoSource
 CMAKE_OPTIONS='-DBUILD_opencv_world:BOOL=OFF -DBUILD_PERF_TESTS:BOOL=OFF -DBUILD_TESTS:BOOL=OFF -DBUILD_DOCS:BOOL=OFF -DWITH_CUDA:BOOL=OFF -DBUILD_EXAMPLES:BOOL=OFF -DCV_TRACE:BOOL=OFF -DBUILD_PNG:BOOL=OFF -DBUILD_ZLIB:BOOL=OFF '
-cmake -G"$CMAKE_CONFIG_GENERATOR"   -DBUILD_SHARED_LIBS:BOOL=OFF -DBUILD_WITH_STATIC_CRT:BOOL=OFF \
--DZLIB_INCLUDE_DIR:PATH=${myRepo}/install/zlib/include -DZLIB_LIBRARY_DEBUG:FILEPATH=${myRepo}/install/zlib/lib/zlibstaticd.lib -DZLIB_LIBRARY_RELEASE:FILEPATH=${myRepo}/install/zlib/lib/zlibstatic.lib \
--DPNG_PNG_INCLUDE_DIR:PATH=${myRepo}/install/libpng/include -DPNG_LIBRARY_RELEASE:FILEPATH=${myRepo}/install/libpng/lib/libpng16_static.lib -DPNG_LIBRARY_DEBUG:FILEPATH=${myRepo}/install/libpng/lib/libpng16_staticd.lib \
+cmake -G"$CMAKE_CONFIG_GENERATOR"   \
+-DZLIB_INCLUDE_DIR:PATH=${myRepo}/install/zlib/include -DZLIB_LIBRARY_DEBUG:FILEPATH=${myRepo}/install/zlib/lib/zlibd.lib -DZLIB_LIBRARY_RELEASE:FILEPATH=${myRepo}/install/zlib/lib/zlib.lib \
+-DPNG_PNG_INCLUDE_DIR:PATH=${myRepo}/install/libpng/include -DPNG_LIBRARY_RELEASE:FILEPATH=${myRepo}/install/libpng/lib/libpng16.lib -DPNG_LIBRARY_DEBUG:FILEPATH=${myRepo}/install/libpng/lib/libpng16d.lib \
 $CMAKE_OPTIONS -DOPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules -DOPENCV_ENABLE_NONFREE:BOOL=ON \
 -DINSTALL_CREATE_DISTRIB=ON -DCMAKE_INSTALL_PREFIX=../../install/"$RepoSource"  ../../"$RepoSource"
 
