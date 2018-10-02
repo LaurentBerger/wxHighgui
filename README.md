@@ -14,4 +14,4 @@ You have to install :
 
 
 
-We don't need libtiff and libjeg (inside wxwidgets) and we use opencv pnglib and opencv zlib 
+We don't need libtiff and libjeg (inside wxwidgets) and we use pnglib and zlib for wxwidgets and opencv
