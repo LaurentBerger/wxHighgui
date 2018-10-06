@@ -4,7 +4,7 @@ set(NomProjet TDwx)
 PROJECT (${NomProjet})
 find_package(opencv  REQUIRED)
 find_package(wxWidgets COMPONENTS core base REQUIRED)
-find_package(wxNanoLib REQUIRED)
+find_package(wxHighguiLib REQUIRED)
 
 option(BUILD_SHARED_LIBS "use shared library" ON)
 

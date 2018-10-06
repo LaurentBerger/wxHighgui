@@ -1,6 +1,6 @@
 message( "patch export")
-file(GLOB_RECURSE _configFiles "${CMAKE_INSTALL_PREFIX}/lib/cmake/wxNanoLib/wxNanoLibConfig-*.cmake")
-message( ${CMAKE_INSTALL_PREFIX}/lib/cmake/wxNanoLib)
+file(GLOB_RECURSE _configFiles "${CMAKE_INSTALL_PREFIX}/lib/cmake/wxHighguiLib/wxHighguiLibConfig-*.cmake")
+message( ${CMAKE_INSTALL_PREFIX}/lib/cmake/wxHighguiLib)
 foreach(_configFile ${_configFiles})
     message ( ${_configFiles})
     file (READ "${_configFile}" _contents)

@@ -1,19 +1,21 @@
 #!/bin/bash -e 
 source ./libmodel.sh
-CMAKE_CONFIG_GENERATOR="Visual Studio 15 2017 Win64" 
-if [ ! -d "$myRepo/wxwidgets" ]; 
-then echo "cloning wxwidgets" 
-git clone https://github.com/wxWidgets/wxWidgets.git 
-mkdir Build/wxwidgets 
-mkdir Install/wxwidgets 
-git submodule update --init 
-else 
-cd wxwidgets 
-git pull --rebase 
-fi 
-cd ..
+if [[ $updateRepo = ON ]]
+	if [ ! -d "$myRepo/wxwidgets" ]; 
+	then 
+		echo "cloning wxwidgets" 
+		git clone https://github.com/wxWidgets/wxWidgets.git 
+		mkdir ${buildRepo}/wxwidgets 
+		mkdir ${installRepo}/wxwidgets 
+		git submodule update --init 
+	else 
+		cd wxwidgets 
+		git pull --rebase 
+	fi 
+	cd ..
+fi
 RepoSource=wxwidgets 
-pushd Build/$RepoSource 
+pushd ${buildRepo}/$RepoSource 
 cmake -G"$CMAKE_CONFIG_GENERATOR" \
 -DwxBUILD_SHARED:BOOL=${SharedLibs} -DwxBUILD_USE_STATIC_RUNTIME:BOOL=OFF -DwxBUILD_COMPATIBILITY=3.1 \
 -DwxUSE_LIBTIFF=OFF -DwxUSE_LIBJPEG=OFF \
@@ -24,7 +26,7 @@ cmake -G"$CMAKE_CONFIG_GENERATOR" \
 -DwxUSE_LIBPNG=sys -DPNG_PNG_INCLUDE_DIR=${installRepo}/libpng/include \
 -DPNG_LIBRARY_DEBUG=${installRepo}/libpng/lib/${pnglibname}d.lib \
 -DPNG_LIBRARY_RELEASE=${installRepo}/libpng/lib/${pnglibname}.lib \
--DCMAKE_INSTALL_PREFIX=${installRepo}/${RepoSource} ../../"$RepoSource" 
+-DCMAKE_INSTALL_PREFIX=${installRepo}/${RepoSource} ${sourceRepo}/"$RepoSource" 
 
 cmake --build . --config release 
 cmake --build . --target install --config release 

@@ -1,17 +1,17 @@
 cmake_minimum_required(VERSION 3.0)
 
 
-set(NomProjet wxNano)
+set(NomProjet wxHighgui)
 set(CMAKE_SUPPRESS_REGENERATION true)
 PROJECT (${NomProjet})
 option(BUILD_SHARED_LIBS "Build shared library" ON)
 find_package(wxWidgets COMPONENTS core base REQUIRED)
 find_package(opencv)
 
-set(wxNanoSample OFF CACHE BOOL "wxNanoLib must be already installed")
-set(wxNanoLib_VERSION_MAJOR 0 CACHE STRING "major version" FORCE)
-set(wxNanoLib_VERSION_MINOR 0 CACHE STRING "minor version" FORCE)
-set(wxNanoLib_VERSION ${wxNanoLib_VERSION_MAJOR}.${wxNanoLib_VERSION_MINOR} CACHE STRING "version" FORCE)
+set(wxHighguiSample OFF CACHE BOOL "wxHighguiLib must be already installed")
+set(wxHighguiLib_VERSION_MAJOR 0 CACHE STRING "major version" FORCE)
+set(wxHighguiLib_VERSION_MINOR 0 CACHE STRING "minor version" FORCE)
+set(wxHighguiLib_VERSION ${wxHighguiLib_VERSION_MAJOR}.${wxHighguiLib_VERSION_MINOR} CACHE STRING "version" FORCE)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_INCLUDE_CURRENT_DIR_IN_INTERFACE ON)
@@ -42,17 +42,17 @@ endif (WIN32)
 include(GenerateExportHeader)
 
 
-file(GLOB wxNanoLib_SRCS     "src/*.cpp")
-file(GLOB wxNanoLib_Headers  "include/*.h" "include/*.hpp")
+file(GLOB wxHighguiLib_SRCS     "src/*.cpp")
+file(GLOB wxHighguiLib_Headers  "include/*.h" "include/*.hpp")
 
-message ("wxNanoLib_VERSION ${wxNanoLib_VERSION}")
+message ("wxHighguiLib_VERSION ${wxHighguiLib_VERSION}")
 message ("CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}")
 message ("CMAKE_CURRENT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}")
 message ("CMAKE_CONFIGURATION_TYPES ${CMAKE_CONFIGURATION_TYPES}")
 
 
-add_library (wxNanoLib STATIC ${wxNanoLib_SRCS})
-set_target_properties(wxNanoLib PROPERTIES  COMPILE_DEFINITIONS "${wxWidgets_DEFINITIONS};_CRT_SECURE_NO_WARNINGS")
+add_library (wxHighguiLib STATIC ${wxHighguiLib_SRCS})
+set_target_properties(wxHighguiLib PROPERTIES  COMPILE_DEFINITIONS "${wxWidgets_DEFINITIONS};_CRT_SECURE_NO_WARNINGS")
 
 if (wxWidgets_FOUND AND OPENCV_FOUND)
 	include_directories(${wxWidgets_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
@@ -80,16 +80,16 @@ add_custom_command (OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_BUILD_CONFIG
                     COMMENT "Generating output_file")
 
 
-target_include_directories(wxNanoLib PUBLIC
+target_include_directories(wxHighguiLib PUBLIC
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 	$<INSTALL_INTERFACE:include>
 	PRIVATE source)
 
-generate_export_header( wxNanoLib )
+generate_export_header( wxHighguiLib )
 
-set_property(TARGET wxNanoLib PROPERTY VERSION ${wxNanoLib_VERSION})
+set_property(TARGET wxHighguiLib PROPERTY VERSION ${wxHighguiLib_VERSION})
 
-install(TARGETS wxNanoLib EXPORT wxNanoLibConfig
+install(TARGETS wxHighguiLib EXPORT wxHighguiLibConfig
   LIBRARY DESTINATION "lib/\${CMAKE_INSTALL_CONFIG_NAME}"
   ARCHIVE DESTINATION "lib/\${CMAKE_INSTALL_CONFIG_NAME}"
   RUNTIME DESTINATION bin
@@ -97,24 +97,24 @@ install(TARGETS wxNanoLib EXPORT wxNanoLibConfig
 )
 
 
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/wxNanoLib_export.h"  DESTINATION include   COMPONENT    Devel)
-install(FILES ${wxNanoLib_Headers} DESTINATION include)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/wxHighguiLib_export.h"  DESTINATION include   COMPONENT    Devel)
+install(FILES ${wxHighguiLib_Headers} DESTINATION include)
 
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
-  "${CMAKE_CURRENT_BINARY_DIR}/wxNanoLib/wxNanoLibConfigVersion.cmake"
-  VERSION ${wxNanoLib_VERSION}
+  "${CMAKE_CURRENT_BINARY_DIR}/wxHighguiLib/wxHighguiLibConfigVersion.cmake"
+  VERSION ${wxHighguiLib_VERSION}
   COMPATIBILITY AnyNewerVersion
 )
 
 
-set(ConfigPackageLocation lib/cmake/wxNanoLib)
+set(ConfigPackageLocation lib/cmake/wxHighguiLib)
 
 message ("ConfigPackageLocation ${ConfigPackageLocation}")
 
-install(EXPORT wxNanoLibConfig
+install(EXPORT wxHighguiLibConfig
   FILE
-    wxNanoLibConfig.cmake
+    wxHighguiLibConfig.cmake
   DESTINATION
     ${ConfigPackageLocation}
 )
@@ -123,6 +123,6 @@ install(EXPORT wxNanoLibConfig
 install(SCRIPT cmake/patch_export_files.cmake DESTINATION
     ${ConfigPackageLocation})
     
-if (wxNanoSample)
+if (wxHighguiSample)
 ADD_SUBDIRECTORY(sample)
-endif(wxNanoSample)
+endif(wxHighguiSample)
