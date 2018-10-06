@@ -1,6 +1,7 @@
 #!/bin/bash -e 
 source ./libmodel.sh
-if [[ $updateRepo = ON ]]
+if [[ $updateRepo = ON ]] 
+then
 	if [ ! -d "$myRepo/wxwidgets" ]; 
 	then 
 		echo "cloning wxwidgets" 
