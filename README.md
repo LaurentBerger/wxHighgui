@@ -6,11 +6,17 @@ You can build library using scripts.
 
 2 - You have to edit libmodel.sh script :
 CMAKE_CONFIG_GENERATOR choose your compiler for cmake
+
 updateRepo=ON means you will update your local repo using git (OFF = no update use it when there is no internet)
+
 myRepo=$(pwd) where you want to clone all repo zlib, libpng wxwidgets and opencv
+
 installRepo=${myRepo}/install  where you want to install all repo zlib, libpng wxwidgets and opencv wxHighgui
+
 buildRepo=${myRepo}/build where you want to install all repo zlib, libpng, wxwidgets, opencv, wxHighgui and sample
+
 sourceRepo=${myRepo} normaly same than $myRepo
+
 SharedLibs=OFF static build
 
 3 - run in git-bash initzlibpng.sh
