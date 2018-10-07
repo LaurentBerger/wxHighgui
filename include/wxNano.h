@@ -1,5 +1,6 @@
 #ifndef __WXNANO_LIB__
 #define __WXNANO_LIB__
+#include "DLLDefines.h"
 #include "wx/wx.h"
 #include <wx/numdlg.h>
 #include<string>
@@ -11,22 +12,23 @@
 #include<opencv2/imgproc.hpp>
 
 
-std::shared_ptr<wxInitializer> InitWX(int, char **);
+wxHighgui_EXPORT std::shared_ptr<wxInitializer> InitWX(int, char **);
 
 namespace wxNano {
 
 typedef void(*MouseCallback) (int event, int x, int y, int flags, void *userdata);
 typedef void(*TrackbarCallback) (int pos, void *userdata);
 
-struct TrackbarManager
+wxHighgui_EXPORT  struct TrackbarManager
 {
     wxSlider *s;
     TrackbarCallback fct;
     void *user;
 };
+template<typename T>wxHighgui_EXPORT T GetNumber(std::string texte1 = std::string(), std::string texte2 = std::string(), std::string texte3 = std::string());
 
 
-template<typename T>T GetNumber(std::string texte1 = std::string(), std::string texte2 = std::string(), std::string texte3 = std::string())
+template<typename T> T GetNumber(std::string texte1, std::string texte2, std::string texte3)
 {
     T x;
     if (typeid(T) == typeid(int))
@@ -40,27 +42,27 @@ template<typename T>T GetNumber(std::string texte1 = std::string(), std::string 
     return x;
 }
 
-template<>double GetNumber<double>(std::string texte1, std::string texte2, std::string texte3);
+template<> wxHighgui_EXPORT double GetNumber<double>(std::string texte1, std::string texte2, std::string texte3);
 
-std::string GetFileName();
-int waitKey(int tps=0);
-int waitKeyEx(int delay = 0);
-void imshow(const std::string &  	winname, cv::InputArray  	mat);
-void namedWindow(const std::string &winname, int  	flags = cv::WINDOW_AUTOSIZE);
-void destroyAllWindows();
-void destroyWindow(const std::string &  	winname);
-void setMouseCallback(const std::string &winname, MouseCallback onMouse, void *userdata = NULL);
-void createTrackbar(const std::string &trackbarname, const std::string &winname, int *value, int count, TrackbarCallback onChange=NULL, void *userdata=NULL);
-int getMouseWheelDelta();
-int getTrackbarPos(const std::string &trackbarname, const std::string &winname);
+wxHighgui_EXPORT std::string GetFileName();
+wxHighgui_EXPORT int waitKey(int tps=0);
+wxHighgui_EXPORT int waitKeyEx(int delay = 0);
+wxHighgui_EXPORT void imshow(const std::string &  	winname, cv::InputArray  	mat);
+wxHighgui_EXPORT void namedWindow(const std::string &winname, int  	flags = cv::WINDOW_AUTOSIZE);
+wxHighgui_EXPORT void destroyAllWindows();
+wxHighgui_EXPORT void destroyWindow(const std::string &  	winname);
+wxHighgui_EXPORT void setMouseCallback(const std::string &winname, MouseCallback onMouse, void *userdata = NULL);
+wxHighgui_EXPORT void createTrackbar(const std::string &trackbarname, const std::string &winname, int *value, int count, TrackbarCallback onChange=NULL, void *userdata=NULL);
+wxHighgui_EXPORT int getMouseWheelDelta();
+wxHighgui_EXPORT int getTrackbarPos(const std::string &trackbarname, const std::string &winname);
 
-void moveWindow(const std::string &winname, int x, int y);
-void resizeWindow(const std::string &winname, int x, int y);
-void resizeWindow(const std::string &winname, cv::Size &size);
-void setTrackbarMax(const std::string &trackbarname, const std::string &winname, int maxval);
-void setTrackbarMin(const std::string &trackbarname, const std::string &winname, int minval);
-void setTrackbarPos(const std::string &trackbarname, const std::string &winname, int pos);
-void setWindowTitle(const std::string &winname, const std::string &title);
+wxHighgui_EXPORT void moveWindow(const std::string &winname, int x, int y);
+wxHighgui_EXPORT void resizeWindow(const std::string &winname, int x, int y);
+wxHighgui_EXPORT void resizeWindow(const std::string &winname, cv::Size &size);
+wxHighgui_EXPORT void setTrackbarMax(const std::string &trackbarname, const std::string &winname, int maxval);
+wxHighgui_EXPORT void setTrackbarMin(const std::string &trackbarname, const std::string &winname, int minval);
+wxHighgui_EXPORT void setTrackbarPos(const std::string &trackbarname, const std::string &winname, int pos);
+wxHighgui_EXPORT void setWindowTitle(const std::string &winname, const std::string &title);
 };
 
 

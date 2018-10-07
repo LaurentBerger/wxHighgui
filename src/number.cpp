@@ -544,7 +544,7 @@ private:
 
 namespace wxNano {
 
-    void namedWindow(const std::string &winname, int  	flags )
+     void namedWindow(const std::string &winname, int  	flags )
     {
         if (winList.get() == NULL)
             winList = std::make_shared<std::map<std::string, std::shared_ptr<ocvFrame>>>();
@@ -602,6 +602,8 @@ namespace wxNano {
 
     int waitKey(int tps)
     {
+        if (!winList.get())
+            return 0;
         eventLoop->DispatchTimeout(tps);
         int c = 0;
         for (auto q : *winList.get())
@@ -616,6 +618,8 @@ namespace wxNano {
 
     int getMouseWheelDelta()
     {
+        if (!winList.get())
+            return 0;
         int c = 0;
         for (auto q : *winList.get())
         {
@@ -629,6 +633,8 @@ namespace wxNano {
 
     int waitKeyEx(int tps)
     {
+        if (!winList.get())
+            return 0;
         eventLoop->DispatchTimeout(tps);
         int c = 0;
         for (auto q : *winList.get())
