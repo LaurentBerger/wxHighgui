@@ -34,9 +34,9 @@ endif (WIN32)
 
 ADD_EXECUTABLE (${NomProjet} ${Projet_SRCS} )
 
-if (wxWidgets_FOUND AND opencv_FOUND AND wxNanoLib_FOUND)
+if (wxWidgets_FOUND AND opencv_FOUND AND wxHighguiLib_FOUND)
 	include_directories(${wxWidgets_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
-	target_link_libraries (${NomProjet} LINK_PUBLIC  ${OpenCV_LIBS} ${wxWidgets_LIBRARIES} wxNanoLib)
+	target_link_libraries (${NomProjet} LINK_PUBLIC  ${OpenCV_LIBS} ${wxWidgets_LIBRARIES} wxHighguiLib)
 endif (wxWidgets_FOUND AND opencv_FOUND AND wxNanoLib_FOUND)
 set_target_properties(${NomProjet} PROPERTIES  COMPILE_DEFINITIONS "${wxWidgets_DEFINITIONS};__WXMSW__;_CRT_SECURE_NO_WARNINGS")
 set_target_properties(${NomProjet} PROPERTIES LINK_FLAGS_DEBUG  "/SUBSYSTEM:CONSOLE")
