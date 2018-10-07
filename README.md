@@ -5,6 +5,7 @@ You can build library using scripts.
 1 - You have to clone this repo and copy all scripts (.sh) in parent repo (=scriptREPO)
 
 2 - You have to edit libmodel.sh script :
+
 CMAKE_CONFIG_GENERATOR choose your compiler for cmake
 
 updateRepo=ON means you will update your local repo using git (OFF = no update use it when there is no internet)
