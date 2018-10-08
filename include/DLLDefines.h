@@ -13,8 +13,12 @@ building a DLL on windows.
 #if defined (_WIN32)
   #if defined(wxHighgui_EXPORTS)
     #define  wxHighgui_EXPORT __declspec(dllexport)
-  #else
-    #define  wxHighgui_EXPORT __declspec(dllimport)
+  #else 
+	#if defined(WXUSINGDLL)
+		#define  wxHighgui_EXPORT __declspec(dllimport)
+      #else
+		#define  wxHighgui_EXPORT
+	#endif
   #endif /* wxHighgui_EXPORTS */
 #else /* defined (_WIN32) */
  #define wxHighgui_EXPORT

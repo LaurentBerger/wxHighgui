@@ -62,9 +62,9 @@ if (wxWidgets_FOUND AND OPENCV_FOUND)
 	include_directories(${wxWidgets_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
 	if (BUILD_SHARED_LIBS)
 	   target_link_libraries (wxHighguiLib LINK_PUBLIC  ${OpenCV_LIBS} ${wxWidgets_LIBRARIES} )
-	   set(configSuffix _dynamic)
+	   set(configSuffix )
 	else (BUILD_SHARED_LIBS)
-	   set(configSuffix _static)
+	   set(configSuffix Static)
 	endif(BUILD_SHARED_LIBS)
 endif (wxWidgets_FOUND AND OPENCV_FOUND)
 
@@ -99,7 +99,7 @@ generate_export_header( wxHighguiLib )
 
 set_property(TARGET wxHighguiLib PROPERTY VERSION ${wxHighguiLib_VERSION})
 set(CMAKE_INSTALL_CONFIG_NAME "${CMAKE_INSTALL_CONFIG_NAME}${configSuffix}")
-
+set(configName "wxHighguiLib${configSuffix}Config.cmake")
 install(TARGETS wxHighguiLib EXPORT wxHighguiLibConfig
   LIBRARY DESTINATION "lib"
   ARCHIVE DESTINATION "lib"
@@ -126,7 +126,7 @@ message ("configSuffix ${configSuffix}")
 
 install(EXPORT wxHighguiLibConfig
   FILE
-    wxHighguiLibConfig.cmake
+    ${configName}
   DESTINATION
     ${ConfigPackageLocation}
 )

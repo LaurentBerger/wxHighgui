@@ -10,11 +10,14 @@ zlibname=zlib
 pnglibname=libpng16
 wxlibs=vc_x64_dll
 ocvlibs=
+wxhighguilib="wxHighguiLib"
 if [[ $SharedLibs = OFF ]]
 then
 zlibname=${zlibname}static
 pnglibname=${pnglibname}_static
 wxlibs=vc_x64_lib
 ocvlibs=x64/vc15/staticlib
+wxhighguilib="wxHighguiLibStatic"
 fi
+export wxhighguilib
 
