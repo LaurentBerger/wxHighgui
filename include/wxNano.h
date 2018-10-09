@@ -12,14 +12,14 @@
 #include<opencv2/imgproc.hpp>
 
 
-wxHighgui_EXPORT std::shared_ptr<wxInitializer> InitWX(int, char **);
+std::shared_ptr<wxInitializer> InitWX(int, char **);
 
 namespace wxNano {
 
 typedef void(*MouseCallback) (int event, int x, int y, int flags, void *userdata);
 typedef void(*TrackbarCallback) (int pos, void *userdata);
 
-wxHighgui_EXPORT  struct TrackbarManager
+struct TrackbarManager
 {
     wxSlider *s;
     TrackbarCallback fct;

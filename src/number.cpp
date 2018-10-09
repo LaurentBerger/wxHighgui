@@ -676,6 +676,8 @@ namespace wxNano {
     }
     void setMouseCallback(const std::string &winname, MouseCallback onMouse, void *userdata)
     {
+        if (!winList.get())
+            return;
         auto q = winList.get()->find(winname);
         if (q != winList.get()->end())
         {
@@ -685,6 +687,8 @@ namespace wxNano {
     }
     void createTrackbar(const std::string &trackbarname, const std::string &winname, int *value, int count, TrackbarCallback onChange, void *userdata)
     {
+        if (!winList.get())
+            return;
         auto q = winList.get()->find(winname);
         if (q != winList.get()->end())
         {
@@ -693,6 +697,8 @@ namespace wxNano {
     }
     int  getTrackbarPos(const std::string &trackbarname, const std::string &winname)
     {
+        if (!winList.get())
+            return 0;
         auto q = winList.get()->find(winname);
         if (q != winList.get()->end())
         {
@@ -707,6 +713,8 @@ namespace wxNano {
 
     void moveWindow(const std::string &winname, int x, int y)
     {
+        if (!winList.get())
+            return;
         auto q = winList.get()->find(winname);
         if (q != winList.get()->end())
         {
@@ -717,6 +725,8 @@ namespace wxNano {
     }
     void resizeWindow(const std::string &winname, int x, int y)
     {
+        if (!winList.get())
+            return;
         auto q = winList.get()->find(winname);
         if (q != winList.get()->end())
         {
@@ -726,6 +736,8 @@ namespace wxNano {
 
     void resizeWindow(const std::string &winname, cv::Size s)
     {
+        if (!winList.get())
+            return;
         auto q = winList.get()->find(winname);
         if (q != winList.get()->end())
         {
@@ -734,6 +746,8 @@ namespace wxNano {
     }
     void setTrackbarMax(const std::string &trackbarname, const std::string &winname, int maxval)
     {
+        if (!winList.get())
+            return;
         auto q = winList.get()->find(winname);
         if (q != winList.get()->end())
         {
@@ -746,6 +760,8 @@ namespace wxNano {
     }
     void setTrackbarMin(const std::string &trackbarname, const std::string &winname, int minval)
     {
+        if (!winList.get())
+            return;
         auto q = winList.get()->find(winname);
         if (q != winList.get()->end())
         {
@@ -758,6 +774,8 @@ namespace wxNano {
     }
     void setTrackbarPos(const std::string &trackbarname, const std::string &winname, int pos)
     {
+        if (!winList.get())
+            return;
         auto q = winList.get()->find(winname);
         if (q != winList.get()->end())
         {
@@ -770,6 +788,8 @@ namespace wxNano {
     }
     void setWindowTitle(const std::string &winname, const std::string &title)
     {
+        if (!winList.get())
+            return;
         auto q = winList.get()->find(winname);
         if (q != winList.get()->end())
         {

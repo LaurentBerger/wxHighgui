@@ -11,7 +11,7 @@ building a DLL on windows.
 // We are using the Visual Studio Compiler and building Shared libraries
 
 #if defined (_WIN32)
-  #if defined(wxHighgui_EXPORTS)
+  #if defined(wxHighguiLib_EXPORTS)
     #define  wxHighgui_EXPORT __declspec(dllexport)
   #else 
 	#if defined(WXUSINGDLL)
